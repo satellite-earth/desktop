@@ -1,0 +1,48 @@
+<html>
+	<body>
+		<div id='container' style="padding: 12; font-family: sans-serif;">
+		</div>
+	</body>
+	<script type="text/javascript">
+
+		window.launcher.handleUpdate((e, data) => {
+
+			//console.log('IN RENDERER', e, data);
+
+			const appNames = data.files.filter(filename => {
+				// TODO should be more robust
+				return filename.indexOf('.pwa') !== -1;
+			});
+
+			const container = document.getElementById('container');
+
+			//console.log('got container', container);
+
+			for (let appName of appNames) {
+
+				const appElement = document.createElement('div');
+
+				appElement.textContent = appName;
+
+				appElement.style['margin-bottom'] = '12px';
+				appElement.style.color = '#FFF';
+				appElement.style.cursor = 'pointer';
+
+				appElement.addEventListener('click', () => {
+
+					//console.log('clicked', appName);
+
+					window.launcher.openApplication({ name: appName });
+
+				});
+
+				container.appendChild(appElement);
+			}
+
+		});
+
+		setTimeout(() => {
+			window.launcher.update();
+		}, 200);
+	</script>
+</html>
