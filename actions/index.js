@@ -351,8 +351,8 @@ const CreateView = () => {
 	const url = encodeURIComponent(`ws://127.0.0.1:${env.PORT}`);
 	const guiPath =
 		process.env.NODE_ENV === 'dev'
-			? path.join(__dirname, '../../satellite-control/dist/index.html')
-			: path.join(process.resourcesPath, 'satellite-control/index.html');
+			? path.join(__dirname, '../../dashboard-ui/dist/index.html')
+			: path.join(process.resourcesPath, 'dashboard-ui/index.html');
 
 	global.view.loadURL(`file://${guiPath}?auth=${auth}&url=${url}&env=local`);
 

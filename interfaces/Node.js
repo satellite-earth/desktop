@@ -23,8 +23,8 @@ class Node {
 
 		const instancePath =
 			process.env.NODE_ENV === 'dev'
-				? path.join(__dirname, '../../satellite-node/index.js')
-				: path.join(process.resourcesPath, 'satellite-node/index.js');
+				? path.join(__dirname, '../../node/index.js')
+				: path.join(process.resourcesPath, 'node/index.js');
 
 		const bindingsPath =
 			process.env.NODE_ENV === 'dev'

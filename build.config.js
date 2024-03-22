@@ -7,12 +7,12 @@ module.exports = {
 	files: ['**/*'],
 	extraResources: [
 		{
-			from: '../satellite-node',
-			to: 'satellite-node',
+			from: '../node',
+			to: 'node',
 		},
 		{
-			from: '../satellite-control/dist',
-			to: 'control',
+			from: '../dashboard-ui/dist',
+			to: 'dashboard',
 		},
 		{
 			from: 'bindings',
