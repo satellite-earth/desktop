@@ -1,35 +1,37 @@
 {
-  "name": "satellite-desktop",
-  "productName": "Satellite",
-  "version": "0.0.1",
-  "main": "main.js",
-  "scripts": {
-    "dev": "NODE_ENV=dev electron .",
-    "build": "electron-builder build --config build.config.js --mac --linux --x64 --arm64 --publish never",
-    "deploy": "node deploy/index.js"
-  },
-  "keywords": [
-    "nostr"
-  ],
-  "author": {
-    "name": "Stuart Bowman",
-    "email": "sbowman@satellite.earth"
-  },
-  "license": "MIT",
-  "devDependencies": {
-    "@aws-sdk/client-s3": "^3.502.0",
-    "@aws-sdk/lib-storage": "^3.502.0",
-    "concurrently": "^8.2.0",
-    "dotenv": "^16.4.1",
-    "electron": "^28.2.0",
-    "electron-builder": "^24.9.1",
-    "electron-rebuild": "^3.2.9",
-    "wait-on": "^7.2.0"
-  },
-  "dependencies": {
-    "adm-zip": "^0.5.10",
-    "electron-log": "^5.1.0",
-    "electron-updater": "^6.1.7",
-    "http-server": "^14.1.1"
-  }
+	"name": "satellite-desktop",
+	"productName": "Satellite",
+	"version": "0.0.1",
+	"main": "main.js",
+	"scripts": {
+		"dev": "NODE_ENV=dev electron .",
+		"build": "electron-builder build --config build.config.js --mac --linux --x64 --arm64 --publish never",
+		"deploy": "node deploy/index.js",
+		"format": "prettier -w ."
+	},
+	"keywords": [
+		"nostr"
+	],
+	"author": {
+		"name": "Stuart Bowman",
+		"email": "sbowman@satellite.earth"
+	},
+	"license": "MIT",
+	"devDependencies": {
+		"@aws-sdk/client-s3": "^3.502.0",
+		"@aws-sdk/lib-storage": "^3.502.0",
+		"concurrently": "^8.2.0",
+		"dotenv": "^16.4.1",
+		"electron": "^28.2.0",
+		"electron-builder": "^24.9.1",
+		"electron-rebuild": "^3.2.9",
+		"prettier": "^3.2.5",
+		"wait-on": "^7.2.0"
+	},
+	"dependencies": {
+		"adm-zip": "^0.5.10",
+		"electron-log": "^5.1.0",
+		"electron-updater": "^6.1.7",
+		"http-server": "^14.1.1"
+	}
 }
