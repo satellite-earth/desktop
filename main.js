@@ -13,14 +13,12 @@ app.on('quit', () => {
 });
 
 app.on('window-all-closed', () => {
-
-  if (process.platform !== 'darwin') {
-  	app.quit();
-  }
+	if (process.platform !== 'darwin') {
+		app.quit();
+	}
 });
 
 app.whenReady().then(() => {
-
 	//app.setName('Satellite');
 
 	Actions.CreateLauncher();
@@ -44,25 +42,21 @@ app.whenReady().then(() => {
 	Actions.CheckRelease();
 
 	app.on('activate', () => {
-
 		if (BrowserWindow.getAllWindows().length === 0) {
 			Actions.CreateView();
 		}
 	});
 
 	powerMonitor.on('suspend', () => {
-
 		console.log('CALLED suspend handler');
 
 		Actions.StopNode();
 	});
 
 	powerMonitor.on('resume', () => {
-
 		console.log('CALLED resume handler');
 
 		// Restart the relay
 		Actions.StartNode();
 	});
-
 });

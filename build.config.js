@@ -2,24 +2,22 @@ module.exports = {
 	appId: 'earth.satellite.node',
 	productName: 'Satellite',
 	directories: {
-		output: './build'
+		output: './build',
 	},
-	files: [
-		'**/*'
-	],
+	files: ['**/*'],
 	extraResources: [
 		{
 			from: '../satellite-node',
-			to: 'satellite-node'
+			to: 'satellite-node',
 		},
 		{
 			from: '../satellite-control/dist',
-			to: 'control'
+			to: 'control',
 		},
 		{
 			from: 'bindings',
-			to: 'bindings'
-		}
+			to: 'bindings',
+		},
 	],
 	mac: {
 		icon: 'assets/icon.icns',
@@ -35,7 +33,7 @@ module.exports = {
 		// ]
 	},
 	linux: {
-		target: 'AppImage'
+		target: 'AppImage',
 		// target: [
 		// 	{
 		// 		target: 'AppImage',
@@ -51,11 +49,11 @@ module.exports = {
 	// 		}
 	// 	]
 	// },
-  publish: {
-    provider: 's3',
-    bucket: 'release',
-    region: 'auto',
-    path: '/',
-    endpoint: 'https://release.satellite.earth'
-  },
+	publish: {
+		provider: 's3',
+		bucket: 'release',
+		region: 'auto',
+		path: '/',
+		endpoint: 'https://release.satellite.earth',
+	},
 };

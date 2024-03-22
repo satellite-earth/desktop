@@ -3,12 +3,9 @@ const { app } = require('electron');
 const path = require('path');
 const { fork } = require('child_process');
 
-
 /* Interact with with local relay */
 class Node {
-
-	constructor (config = {}, event) {
-
+	constructor(config = {}, event) {
 		this.config = config;
 		this.event = event;
 
@@ -16,8 +13,7 @@ class Node {
 		this.listening = false;
 	}
 
-	start () {
-
+	start() {
 		if (this.started) {
 			console.log('Did not start relay - process already started');
 			return;
@@ -25,29 +21,29 @@ class Node {
 
 		this.started = true;
 
-		const instancePath = process.env.NODE_ENV === 'dev'
-		? path.join(__dirname, '../../satellite-node/index.js')
-		: path.join(process.resourcesPath, 'satellite-node/index.js');
+		const instancePath =
+			process.env.NODE_ENV === 'dev'
+				? path.join(__dirname, '../../satellite-node/index.js')
+				: path.join(process.resourcesPath, 'satellite-node/index.js');
 
-		const bindingsPath = process.env.NODE_ENV === 'dev'
-		? path.join(__dirname, '../bindings')
-		: path.join(process.resourcesPath, 'bindings');
+		const bindingsPath =
+			process.env.NODE_ENV === 'dev'
+				? path.join(__dirname, '../bindings')
+				: path.join(process.resourcesPath, 'bindings');
 
 		// Start the local relay database on another thread
 		this.process = fork(instancePath, [], {
 			env: {
 				DATA_PATH: app.getPath('userData'),
 				NATIVE_BINDINGS_PATH: bindingsPath,
-				...this.config
-			}
+				...this.config,
+			},
 		});
 
 		// Listen for messages broadcast by the child
 		// process so tray ui can reflect node status
-		this.process.on('message', message => {
-
+		this.process.on('message', (message) => {
 			if (message.type === 'LISTENER_STATE') {
-
 				this.listening = message.data.listening;
 			}
 
@@ -67,8 +63,7 @@ class Node {
 		this.event({ type: 'STARTED' });
 	}
 
-	stop (params) {
-
+	stop(params) {
 		if (!this.process) {
 			console.log('Did not stop relay - process does not exist');
 			return;
@@ -83,7 +78,7 @@ class Node {
 		// 	this.process.kill('SIGINT');
 		// 	//return;
 		// }
-		
+
 		// this.started = false;
 		// this.listening = false;
 
@@ -91,16 +86,14 @@ class Node {
 		//this.event({ type: 'STOPPED' });
 	}
 
-	sendIpc (action, data) {
-
-		if (!this.process) { return; }
+	sendIpc(action, data) {
+		if (!this.process) {
+			return;
+		}
 
 		try {
-
-			this.process.send([ action, data ]);
-
+			this.process.send([action, data]);
 		} catch (err) {
-
 			console.log(err);
 		}
 	}
