@@ -5,6 +5,7 @@ const {
 	Menu,
 	Tray,
 	nativeImage,
+	ipcMain,
 } = require('electron');
 const {
 	/*autoUpdater*/ MacUpdater,
@@ -17,6 +18,7 @@ const os = require('os');
 
 const Launcher = require('../interfaces/Launcher');
 const Node = require('../interfaces/Node');
+const { IS_DEV, OVERRIDE_UI } = require('../env.js');
 
 const BeforeQuit = () => {
 	clearInterval(global._satelliteCheckForUpdatesInterval);
@@ -25,7 +27,7 @@ const BeforeQuit = () => {
 };
 
 const CheckRelease = () => {
-	if (process.env.NODE_ENV === 'dev') {
+	if (IS_DEV) {
 		console.log('skipped update check in dev');
 		return;
 	}
@@ -337,12 +339,23 @@ const CreateView = () => {
 	const mainScreen = screen.getPrimaryDisplay();
 	const { width, height } = mainScreen.size;
 
+	// TODO: move to a more better place
+	ipcMain.handle('get-satellite-config', () => ({
+		localRelay: new URL(`ws://127.0.0.1:${env.PORT}`).toString(),
+		adminAuth: env.AUTH,
+	}));
+
 	// Create the main application window
-	global.view = new BrowserWindow({
+	const view = new BrowserWindow({
 		width,
 		height,
 		backgroundColor: '#171819',
 		icon: path.join(__dirname, '../assets/logo.png'),
+		webPreferences: {
+			webSecurity: false,
+			allowRunningInsecureContent: false,
+			preload: path.join(__dirname, '../preload/satellite.js'),
+		},
 		// x: 0, // dev only
 		// y: 0 // dev only
 	});
@@ -350,14 +363,16 @@ const CreateView = () => {
 	const env = LoadConfig();
 	const auth = encodeURIComponent(env.AUTH);
 	const url = encodeURIComponent(`ws://127.0.0.1:${env.PORT}`);
-	const guiPath =
-		process.env.NODE_ENV === 'dev'
-			? path.join(__dirname, '../../dashboard-ui/dist/index.html')
-			: path.join(process.resourcesPath, 'dashboard-ui/index.html');
+	const htmlPath = IS_DEV
+		? path.join(__dirname, '../../dashboard-ui/dist/index.html')
+		: path.join(process.resourcesPath, 'dashboard-ui/index.html');
+	const guiURL = `file://${htmlPath}?auth=${auth}&url=${url}&env=local`;
 
-	global.view.loadURL(`file://${guiPath}?auth=${auth}&url=${url}&env=local`);
+	view.loadURL(OVERRIDE_UI || guiURL);
 
-	//global.view.openDevTools();
+	if (IS_DEV) view.openDevTools();
+
+	global.view = view;
 };
 
 const LoadConfig = () => {
