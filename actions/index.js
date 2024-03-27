@@ -13,6 +13,7 @@ const {
 const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 
 const Launcher = require('../interfaces/Launcher');
 const Node = require('../interfaces/Node');
@@ -149,7 +150,7 @@ const SaveJson = (data, params) => {
 
 const CreateLauncher = () => {
 	global.launcher = new Launcher({
-		path: `/Users/sbowman/Desktop/pwa`,
+		path: path.join(os.homedir(), 'pwa'),
 	});
 
 	// TODO ip handle open app
