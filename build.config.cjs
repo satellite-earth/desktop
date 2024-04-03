@@ -9,6 +9,10 @@ module.exports = {
 		{
 			from: '../node',
 			to: 'node',
+			filter: [
+				'**/*',
+				'!**/{.DS_Store,.env,.git}',
+			],
 		},
 		{
 			from: '../dashboard-ui/dist',
