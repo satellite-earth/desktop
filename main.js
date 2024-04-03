@@ -1,5 +1,5 @@
-const { app, BrowserWindow, powerMonitor } = require('electron');
-const Actions = require('./actions');
+import { app, BrowserWindow, powerMonitor } from 'electron';
+import * as Actions from './actions/index.js';
 
 // // https://www.electronforge.io/config/makers/squirrel.windows#handling-startup-events
 // if (require('electron-squirrel-startup')) {

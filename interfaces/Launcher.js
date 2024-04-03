@@ -1,11 +1,14 @@
-const { app, ipcMain, screen, BrowserWindow } = require('electron');
-const path = require('path');
-const fs = require('fs');
-const { fork } = require('child_process');
-const AdmZip = require('adm-zip');
+import { ipcMain, screen, BrowserWindow } from 'electron';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
+import { fork } from 'child_process';
+import AdmZip from 'adm-zip';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /* Launch other nostr apps */
-class Launcher {
+export default class Launcher {
 	constructor(config = {}) {
 		this.config = config;
 		this.servers = {};
@@ -130,5 +133,3 @@ class Launcher {
 		}
 	}
 }
-
-module.exports = Launcher;

@@ -1,10 +1,12 @@
-//const WebSocket = require('ws');
-const { app } = require('electron');
-const path = require('path');
-const { fork } = require('child_process');
+import { app } from 'electron';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { fork } from 'child_process';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /* Interact with with local relay */
-class Node {
+export default class Node {
 	constructor(config = {}, event) {
 		this.config = config;
 		this.event = event;
@@ -98,5 +100,3 @@ class Node {
 		}
 	}
 }
-
-module.exports = Node;

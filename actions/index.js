@@ -1,4 +1,4 @@
-const {
+import {
 	app,
 	BrowserWindow,
 	screen,
@@ -6,19 +6,20 @@ const {
 	Tray,
 	nativeImage,
 	ipcMain,
-} = require('electron');
-const {
-	/*autoUpdater*/ MacUpdater,
-	AppImageUpdater,
-} = require('electron-updater');
-const crypto = require('crypto');
-const path = require('path');
-const fs = require('fs');
-const os = require('os');
+} from 'electron';
+import logger from 'electron-log';
+import { MacUpdater, AppImageUpdater } from 'electron-updater';
+import crypto from 'crypto';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
+import os from 'os';
 
-const Launcher = require('../interfaces/Launcher');
-const Node = require('../interfaces/Node');
-const { IS_DEV, OVERRIDE_UI } = require('../env.js');
+import Launcher from '../interfaces/Launcher.js';
+import Node from '../interfaces/Node.js';
+import { IS_DEV, OVERRIDE_UI } from '../env.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const BeforeQuit = () => {
 	clearInterval(global._satelliteCheckForUpdatesInterval);
@@ -73,7 +74,7 @@ const CheckRelease = () => {
 
 	//autoUpdater.forceDevUpdateConfig = true;
 
-	global._satelliteAutoUpdater.logger = require('electron-log');
+	global._satelliteAutoUpdater.logger = logger;
 	global._satelliteAutoUpdater.logger.transports.file.level = 'debug';
 
 	const checkForUpdatesAndNotify = async () => {
@@ -409,7 +410,7 @@ const StopNode = () => {
 	relay.process = null;
 };
 
-module.exports = {
+export {
 	BeforeQuit,
 	CheckRelease,
 	CreateLauncher,
