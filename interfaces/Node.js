@@ -25,8 +25,8 @@ export default class Node {
 
 		const instancePath =
 			process.env.NODE_ENV === 'dev'
-				? path.join(__dirname, '../../node/index.js')
-				: path.join(process.resourcesPath, 'node/index.js');
+				? path.join(__dirname, '../../private-node/dist/index.js')
+				: path.join(process.resourcesPath, 'private-node/dist/index.js');
 
 		const bindingsPath =
 			process.env.NODE_ENV === 'dev'
