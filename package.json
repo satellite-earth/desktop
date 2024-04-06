@@ -6,7 +6,8 @@
 	"type": "module",
 	"scripts": {
 		"dev": "NODE_ENV=dev electron .",
-		"build": "electron-builder build --config build.config.cjs --mac --arm64 --publish never",
+		"build": "electron-builder build --config build.config.cjs --mac --linux --x64 --arm64 --publish never",
+		"build-linux": "electron-builder build --config build.config.cjs --linux --x64 --arm64 --publish never",
 		"deploy": "node deploy/index.js",
 		"format": "prettier -w ."
 	},

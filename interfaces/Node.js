@@ -28,11 +28,6 @@ export default class Node {
 				? path.join(__dirname, '../../private-node/dist/index.js')
 				: path.join(process.resourcesPath, 'private-node/dist/index.js');
 
-		const bindingsPath =
-			process.env.NODE_ENV === 'dev'
-				? path.join(__dirname, '../bindings')
-				: path.join(process.resourcesPath, 'bindings');
-
 		// Start the local relay database on another thread
 		this.process = fork(instancePath, [], {
 			env: {
