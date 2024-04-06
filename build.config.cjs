@@ -1,3 +1,7 @@
+// change build script back
+// "build": "electron-builder build --config build.config.cjs --mac --linux --x64 --arm64 --publish never"
+
+
 module.exports = {
 	appId: 'earth.satellite.node',
 	productName: 'Satellite',
@@ -7,8 +11,16 @@ module.exports = {
 	files: ['**/*'],
 	extraResources: [
 		{
-			from: '../node',
-			to: 'node',
+			from: '../core',
+			to: 'core',
+			filter: [
+				'**/*',
+				'!**/{.DS_Store,.env,.git}',
+			],
+		},
+		{
+			from: '../private-node',
+			to: 'private-node',
 			filter: [
 				'**/*',
 				'!**/{.DS_Store,.env,.git}',
@@ -16,7 +28,7 @@ module.exports = {
 		},
 		{
 			from: '../dashboard-ui/dist',
-			to: 'dashboard',
+			to: 'dashboard-ui',
 		},
 		{
 			from: 'bindings',

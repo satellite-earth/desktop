@@ -364,7 +364,7 @@ const CreateView = () => {
 	const env = LoadConfig();
 	const auth = encodeURIComponent(env.AUTH);
 	const url = encodeURIComponent(`ws://127.0.0.1:${env.PORT}`);
-	const htmlPath = IS_DEV
+	const htmlPath = /*IS_DEV*/process.env.NODE_ENV === 'dev'
 		? path.join(__dirname, '../../dashboard-ui/dist/index.html')
 		: path.join(process.resourcesPath, 'dashboard-ui/index.html');
 	const guiURL = `file://${htmlPath}?auth=${auth}&url=${url}&env=local`;
@@ -383,7 +383,8 @@ const LoadConfig = () => {
 	if (!env) {
 		env = {
 			AUTH: crypto.randomBytes(20).toString('hex'),
-			PORT: 2001,
+			HTTP_PORT: 2011,
+			PORT: 2012,
 		};
 
 		SaveJson(env, { path: file });
