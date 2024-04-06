@@ -37,7 +37,7 @@ export default class Node {
 		this.process = fork(instancePath, [], {
 			env: {
 				DATA_PATH: app.getPath('userData'),
-				NATIVE_BINDINGS_PATH: bindingsPath,
+				USE_PREBUILT_SQLITE_BINDINGS: true,
 				...this.config,
 			},
 		});
