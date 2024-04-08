@@ -383,7 +383,6 @@ const LoadConfig = () => {
 	if (!env) {
 		env = {
 			AUTH: crypto.randomBytes(20).toString('hex'),
-			HTTP_PORT: 2011,
 			PORT: 2012,
 		};
 
