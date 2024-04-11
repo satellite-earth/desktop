@@ -25,11 +25,7 @@ module.exports = {
 		{
 			from: '../dashboard-ui/dist',
 			to: 'dashboard-ui',
-		},
-		{
-			from: 'bindings',
-			to: 'bindings',
-		},
+		}
 	],
 	mac: {
 		icon: 'assets/icon.icns',
