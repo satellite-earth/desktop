@@ -13,7 +13,8 @@
 		"build-linux": "electron-builder --linux --x64 --arm64 --publish never",
 		"build-all": "electron-builder --linux --mac --win --x64 --arm64 --publish never",
 		"deploy": "node deploy/index.js",
-		"format": "prettier -w ."
+		"format": "prettier -w .",
+		"postinstall": "electron-builder install-app-deps"
 	},
 	"keywords": [
 		"nostr"
