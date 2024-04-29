@@ -1,39 +1,26 @@
 import { ipcMain, screen, BrowserWindow } from 'electron';
-import path from 'path';
 import { fileURLToPath } from 'url';
+import { ChildProcess, fork } from 'child_process';
+import path from 'path';
 import fs from 'fs';
-import { fork } from 'child_process';
 import AdmZip from 'adm-zip';
+import { logger } from '../logger.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /* Launch other nostr apps */
 export default class Launcher {
-	constructor(config = {}) {
-		this.config = config;
-		this.servers = {};
+	log = logger.extend('pwa-launcher');
+	directory: string;
 
-		ipcMain.handle('update', () => {
-			const files = fs.readdirSync(this.config.path);
+	pickerWindow: BrowserWindow;
+	servers: Record<string, ChildProcess> = {};
 
-			this.modal.webContents.send('update', {
-				files,
-			});
-		});
+	constructor(directory: string) {
+		this.directory = directory;
 
-		ipcMain.handle('openApplication', (e, params) => {
-			this.start({
-				name: params.name,
-			});
-
-			this.modal.close();
-		});
-	}
-
-	open() {
-		this.modal = new BrowserWindow({
+		this.pickerWindow = new BrowserWindow({
 			title: 'Launch Nostr App',
-			parent: view,
 			closable: true,
 			minimizable: false,
 			maximizable: false,
@@ -42,31 +29,46 @@ export default class Launcher {
 			width: 450,
 			backgroundColor: '#000',
 			webPreferences: {
-				preload: path.join(__dirname, '../preload/launcher.js'),
+				preload: path.join(__dirname, '../preload/launcher.cjs'),
 			},
 		});
 
-		// Open a dialog prompting user, passing params in the query string
-		//this.modal.loadURL(`file://${path.join(__dirname, '/views/AppLauncher/index.html')}`);
-		this.modal.loadFile(
-			path.join(__dirname, '../views/AppLauncher/index.html'),
-		);
+		ipcMain.handle('update', () => {
+			const files = fs.readdirSync(this.directory);
 
-		this.modal.once('ready-to-show', () => {
-			this.modal.show();
-			//this.modal.webContents.openDevTools();
+			this.pickerWindow.webContents.send('update', {
+				files,
+			});
+		});
+
+		ipcMain.handle('openApplication', (e, params) => {
+			this.start(params.name);
+
+			this.pickerWindow.close();
 		});
 	}
 
-	start({ name }) {
-		const appPath = path.join(this.config.path, `${name}.pwa`);
-		const dirPath = path.join(this.config.path, name);
+	open() {
+		// Open a dialog prompting user, passing params in the query string
+		this.pickerWindow.loadFile(
+			path.join(__dirname, '../views/AppLauncher/index.html'),
+		);
+
+		this.pickerWindow.once('ready-to-show', () => {
+			this.pickerWindow.show();
+			this.pickerWindow.focus();
+		});
+	}
+
+	start(name: string) {
+		const appPath = path.join(this.directory, `${name}.pwa`);
+		const dirPath = path.join(this.directory, name);
 
 		// TODO maybe do some safety checks to ensure
 		// that the .pwa file actually exits
 
 		if (!fs.existsSync(dirPath)) {
-			console.log(`Creating ${dirPath}`);
+			this.log(`Creating ${dirPath}`);
 			fs.mkdirSync(dirPath);
 		}
 
@@ -74,10 +76,7 @@ export default class Launcher {
 
 		zip.extractAllTo(dirPath);
 
-		const params = this.serve({
-			path: dirPath,
-			name,
-		});
+		const url = this.serve(name, dirPath);
 
 		const mainScreen = screen.getPrimaryDisplay();
 		const { width, height } = mainScreen.size;
@@ -89,20 +88,17 @@ export default class Launcher {
 		});
 
 		pwa.on('closed', () => {
-			// TODO shutdown serve process
-
 			this.stop(name);
 		});
 
-		// TODO this timeout thing is a hack, need to find way
+		// TODO: this timeout thing is a hack, need to find way
 		// of reliably detecting when the server has started
-
 		setTimeout(() => {
-			pwa.loadURL(params.url);
+			pwa.loadURL(url);
 		}, 500);
 	}
 
-	serve({ name, path }) {
+	serve(name: string, dir: string) {
 		const port = 3012 + Object.keys(this.servers).length;
 
 		// TODO assigning the port needs to be more robust to
@@ -110,24 +106,20 @@ export default class Launcher {
 
 		this.servers[name] = fork(
 			`./node_modules/.bin/http-server`,
-			[path, `--port=${port}`],
+			[dir, `--port=${port}`],
 			{},
 		);
 
-		return {
-			url: `http://127.0.0.1:${port}`,
-		};
+		return `http://127.0.0.1:${port}`;
 	}
 
-	stop(name) {
-		if (!this.servers[name]) {
-			return;
-		}
+	stop(name: string) {
+		if (!this.servers[name]) return;
 
 		this.servers[name].kill('SIGINT');
 	}
 
-	stopAll(params) {
+	stopAll() {
 		for (let name of Object.keys(this.servers)) {
 			this.stop(name);
 		}

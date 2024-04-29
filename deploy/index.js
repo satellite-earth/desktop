@@ -11,17 +11,15 @@ const client = new S3Client({
 	endpoint: `https://${process.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com`,
 	credentials: {
 		secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
-		accessKeyId: process.env.S3_ACCESS_KEY_ID
-	}
+		accessKeyId: process.env.S3_ACCESS_KEY_ID,
+	},
 });
 
 const ReadFile = (filename) => {
-
 	return fs.createReadStream(path.join(__dirname, `../build/${filename}`));
 };
 
 const UploadStream = async (data, options) => {
-
 	// Initiate upload
 	const uploading = new Upload({
 		client,
@@ -29,8 +27,8 @@ const UploadStream = async (data, options) => {
 			Key: options.filename,
 			Bucket: 'release',
 			Body: data,
-			...(options.headers || {})
-		}
+			...(options.headers || {}),
+		},
 	});
 
 	// Log upload progress
@@ -47,9 +45,7 @@ const UploadStream = async (data, options) => {
 };
 
 const ComputeHash = (filename) => {
-
-	return new Promise(resolve => {
-
+	return new Promise((resolve) => {
 		const hash = crypto.createHash('sha256').setEncoding('hex');
 
 		hash.on('finish', () => {
@@ -73,63 +69,59 @@ const builds = [
 		name: `Satellite-${process.env.npm_package_version}-mac.zip`,
 		arch: 'x64',
 		platform: 'mac',
-		manifest: false
+		manifest: false,
 	},
 	{
 		name: `Satellite-${process.env.npm_package_version}.dmg`,
 		arch: 'x64',
 		platform: 'mac',
-		manifest: true
+		manifest: true,
 	},
 	{
 		name: `Satellite-${process.env.npm_package_version}.AppImage`,
 		arch: 'x64',
 		platform: 'linux',
-		manifest: true
+		manifest: true,
 	},
 	{
 		name: `Satellite-${process.env.npm_package_version}-arm64-mac.zip`,
 		arch: 'arm64',
 		platform: 'mac',
-		manifest: false
+		manifest: false,
 	},
 	{
 		name: `Satellite-${process.env.npm_package_version}-arm64.dmg`,
 		arch: 'arm64',
 		platform: 'mac',
-		manifest: true
+		manifest: true,
 	},
 	{
 		name: `Satellite-${process.env.npm_package_version}-arm64.AppImage`,
 		arch: 'arm64',
 		platform: 'linux',
-		manifest: true
-	}
+		manifest: true,
+	},
 ];
 
-const yamls = [
-	`latest-mac.yml`,
-	`latest-linux.yml`,
-	`latest-linux-arm64.yml`
-];
+const yamls = [`latest-mac.yml`, `latest-linux.yml`, `latest-linux-arm64.yml`];
 
 const run = async () => {
-
-	console.log('DEPLOYING VERSION ' + process.env.npm_package_version + ' . . .' + '\n');
+	console.log(
+		'DEPLOYING VERSION ' + process.env.npm_package_version + ' . . .' + '\n',
+	);
 
 	let error;
 
 	// Try to upload all builds first
 	for (let filename of blockmaps) {
-
-		if (error) { break; }
+		if (error) {
+			break;
+		}
 
 		try {
-
 			await UploadStream(ReadFile(filename), {
-				filename
+				filename,
 			});
-
 		} catch (err) {
 			console.log('ERROR UPLOADING ' + filename, err);
 			error = err;
@@ -137,22 +129,20 @@ const run = async () => {
 	}
 
 	if (!error) {
-
 		// Try to upload all builds first
 		for (let item of builds) {
-
-			if (error) { break; }
+			if (error) {
+				break;
+			}
 
 			try {
-
 				item.sha256 = await ComputeHash(item.name);
 
 				console.log(`SHA256 ${item.sha256} (${item.name})`);
 
 				await UploadStream(ReadFile(item.name), {
-					filename: item.name
+					filename: item.name,
 				});
-
 			} catch (err) {
 				console.log('ERROR UPLOADING ' + item.name, err);
 				error = err;
@@ -162,47 +152,52 @@ const run = async () => {
 
 	// If all builds succeeded, upload manifests
 	if (!error) {
-
 		for (let item of yamls) {
-
-			if (error) { break; }
+			if (error) {
+				break;
+			}
 
 			try {
-
 				await UploadStream(ReadFile(item), {
-					filename: item
+					filename: item,
 				});
-
 			} catch (err) {
 				console.log('ERROR UPLOADING ' + item, err);
 				error = err;
 			}
-		}		
+		}
 	}
 
 	try {
-
 		const released = Math.floor(Date.now() / 1000);
 
-		await UploadStream(Buffer.from(JSON.stringify(builds.filter(build => {
-			return build.manifest;
-		}).map(({ name, arch, platform, sha256 }) => {
-			return {
-				name,
-				version: process.env.npm_package_version,
-				released,
-				platform,
-				arch,
-				sha256,
-				url: `https://release.satellite.earth/${name}`
-			};
-		}))), {
-			filename: 'manifest.json',
-			headers: {
-				ContentType: 'application/json'
-			}
-		});
-
+		await UploadStream(
+			Buffer.from(
+				JSON.stringify(
+					builds
+						.filter((build) => {
+							return build.manifest;
+						})
+						.map(({ name, arch, platform, sha256 }) => {
+							return {
+								name,
+								version: process.env.npm_package_version,
+								released,
+								platform,
+								arch,
+								sha256,
+								url: `https://release.satellite.earth/${name}`,
+							};
+						}),
+				),
+			),
+			{
+				filename: 'manifest.json',
+				headers: {
+					ContentType: 'application/json',
+				},
+			},
+		);
 	} catch (err) {
 		console.log('ERROR UPLOADING latest.json ', err);
 		error = err;

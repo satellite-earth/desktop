@@ -1,8 +1,7 @@
-//import { contextBridge, ipcRenderer } from 'electron';
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('launcher', {
-	openApplication: (params) => {
+	openApplication(params: any) {
 		console.log('params', params);
 
 		ipcRenderer.invoke('openApplication', {
@@ -16,17 +15,7 @@ contextBridge.exposeInMainWorld('launcher', {
 		ipcRenderer.invoke('update');
 	},
 
-	handleUpdate: (callback) => {
+	handleUpdate(callback: () => void) {
 		return ipcRenderer.on('update', callback);
 	},
 });
-
-// setTimeout(() => {
-
-// 	console.log('timeout fired');
-
-// 	window.launcher.update();
-
-// 	console.log('called update');
-
-// });

@@ -1,0 +1,25 @@
+appId: 'earth.satellite.node'
+productName: 'Satellite'
+directories:
+  output: './build'
+
+files: ['dist', 'assets', 'views']
+
+mac:
+  icon: 'assets/icon.icns'
+
+linux:
+  target: 'AppImage'
+  category: P2P
+
+win:
+  target:
+    - target: 'nsis'
+      arch: ['x64']
+
+publish:
+  provider: 's3'
+  bucket: 'release'
+  region: 'auto'
+  path: '/'
+  endpoint: 'https://release.satellite.earth'
