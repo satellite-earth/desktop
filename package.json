@@ -7,11 +7,10 @@
 	"scripts": {
 		"dev": "NODE_ENV=development electron .",
 		"build": "tsc",
-		"build-electron": "electron-builder build --config build.config.cjs --publish never",
-		"build-mac": "electron-builder --mac --x64 --arm64 --publish never",
-		"build-win": "electron-builder --win --x64 --arm64 --publish never",
-		"build-linux": "electron-builder --linux --x64 --arm64 --publish never",
-		"build-all": "electron-builder --linux --mac --win --x64 --arm64 --publish never",
+		"build-mac": "electron-builder --config build.config.cjs --mac --x64 --arm64 --publish never",
+		"build-win": "electron-builder --config build.config.cjs --win --x64 --arm64 --publish never",
+		"build-linux": "electron-builder --config build.config.cjs --linux --x64 --arm64 --publish never",
+		"build-all": "electron-builder --config build.config.cjs --linux --mac --win --x64 --arm64 --publish never",
 		"deploy": "node deploy/index.js",
 		"format": "prettier -w .",
 		"postinstall": "electron-builder install-app-deps"
@@ -29,6 +28,9 @@
 		"debug": "^4.3.4",
 		"electron-log": "^5.1.2",
 		"electron-updater": "^6.1.8",
+		"@satellite-earth/community-ui": "^0.1.1",
+		"@satellite-earth/dashboard-ui": "^0.1.1",
+		"@satellite-earth/private-node": "^0.2.0",
 		"http-server": "^14.1.1",
 		"import-meta-resolve": "^4.1.0"
 	},
@@ -37,13 +39,11 @@
 		"@aws-sdk/lib-storage": "^3.502.0",
 		"@types/adm-zip": "^0.5.5",
 		"@types/node": "^20.12.7",
-		"concurrently": "^8.2.0",
 		"dotenv": "^16.4.1",
 		"electron": "28.2.0",
 		"electron-builder": "^24.13.3",
 		"electron-rebuild": "^3.2.9",
 		"prettier": "^3.2.5",
-		"typescript": "^5.4.5",
-		"wait-on": "^7.2.0"
+		"typescript": "^5.4.5"
 	}
 }
