@@ -18,7 +18,7 @@ export default class TrayManager {
 		this.desktop = desktop;
 
 		const icon = nativeImage.createFromPath(
-			path.join(__dirname, '../assets/tray.png'),
+			path.join(__dirname, '../../assets/tray.png'),
 		);
 		this.tray = new Tray(
 			icon.resize({
@@ -57,10 +57,10 @@ export default class TrayManager {
 
 	updateMenu() {
 		const runningIcon = nativeImage.createFromPath(
-			path.join(__dirname, '../assets/green_circle.png'),
+			path.join(__dirname, '../../assets/green_circle.png'),
 		);
 		const stoppedIcon = nativeImage.createFromPath(
-			path.join(__dirname, '../assets/red_circle.png'),
+			path.join(__dirname, '../../assets/red_circle.png'),
 		);
 
 		this.menu = Menu.buildFromTemplate([
