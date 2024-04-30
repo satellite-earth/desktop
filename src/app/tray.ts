@@ -5,16 +5,6 @@ import path from 'path';
 import type Desktop from './index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const icon = nativeImage.createFromPath(
-	path.join(__dirname, '../assets/tray.png'),
-);
-
-const runningIcon = nativeImage.createFromPath(
-	path.join(__dirname, '../assets/green_circle.png'),
-);
-const stoppedIcon = nativeImage.createFromPath(
-	path.join(__dirname, '../assets/red_circle.png'),
-);
 
 export default class TrayManager {
 	tray: Tray;
@@ -27,6 +17,9 @@ export default class TrayManager {
 	constructor(desktop: Desktop) {
 		this.desktop = desktop;
 
+		const icon = nativeImage.createFromPath(
+			path.join(__dirname, '../assets/tray.png'),
+		);
 		this.tray = new Tray(
 			icon.resize({
 				height: 16,
@@ -63,6 +56,13 @@ export default class TrayManager {
 	}
 
 	updateMenu() {
+		const runningIcon = nativeImage.createFromPath(
+			path.join(__dirname, '../assets/green_circle.png'),
+		);
+		const stoppedIcon = nativeImage.createFromPath(
+			path.join(__dirname, '../assets/red_circle.png'),
+		);
+
 		this.menu = Menu.buildFromTemplate([
 			this.desktop.node.started
 				? {

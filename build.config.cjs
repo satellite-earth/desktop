@@ -52,7 +52,4 @@ module.exports = {
 		endpoint: 'https://release.satellite.earth',
 	},
 	includeSubNodeModules: true,
-	onNodeModuleFile: (file) => {
-		console.log(file);
-	},
 };
