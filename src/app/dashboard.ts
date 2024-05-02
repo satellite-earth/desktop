@@ -38,11 +38,5 @@ export default class DashboardWindow extends BrowserWindow {
 
 		// @ts-expect-error
 		if (IS_DEV) this.openDevTools();
-
-		// TODO: move to a better place
-		ipcMain.handle('get-satellite-config', () => ({
-			localRelay: new URL(`ws://127.0.0.1:${config.nodePort}`).toString(),
-			adminAuth: config.auth,
-		}));
 	}
 }

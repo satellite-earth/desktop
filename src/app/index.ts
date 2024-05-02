@@ -1,4 +1,4 @@
-import { powerMonitor } from 'electron';
+import { ipcMain, powerMonitor } from 'electron';
 import path from 'path';
 import os from 'os';
 
@@ -58,12 +58,20 @@ export default class Desktop {
 		this.menuManager.setup();
 		this.trayManager.setup();
 
+		ipcMain.handle('get-satellite-config', () => ({
+			localRelay: new URL(`ws://127.0.0.1:${config.nodePort}`).toString(),
+			adminAuth: config.auth,
+		}));
+
 		this.openDashboard();
 	}
 
 	openDashboard() {
 		if (!this.dashboard) {
 			this.dashboard = new DashboardWindow(this.config);
+			this.dashboard.on('closed', () => {
+				this.dashboard = undefined;
+			});
 		}
 
 		if (this.dashboard.isVisible()) {

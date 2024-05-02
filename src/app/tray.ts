@@ -11,9 +11,6 @@ export default class TrayManager {
 	menu?: Menu;
 	desktop: Desktop;
 
-	localStatusItem: MenuItem;
-	remoteStatusItem: MenuItem;
-
 	constructor(desktop: Desktop) {
 		this.desktop = desktop;
 
@@ -28,16 +25,6 @@ export default class TrayManager {
 		);
 
 		this.tray.setToolTip('Satellite Status');
-
-		this.localStatusItem = new MenuItem({
-			label: 'Local Relay Status',
-			enabled: false,
-		});
-
-		this.remoteStatusItem = new MenuItem({
-			label: 'Remote Status',
-			enabled: false,
-		});
 	}
 
 	setup() {
@@ -68,19 +55,23 @@ export default class TrayManager {
 				? {
 						label: `Local Relay Active (port ${this.desktop.config.nodePort})`,
 						icon: runningIcon,
+						enabled: false,
 					}
 				: {
 						label: `Local Relay Stopped`,
 						icon: stoppedIcon,
+						enabled: false,
 					},
 			this.desktop.node.listening
 				? {
 						label: 'Remote Listeners Active',
 						icon: runningIcon,
+						enabled: false,
 					}
 				: {
 						label: 'Remote Listeners Disconnected',
 						icon: stoppedIcon,
+						enabled: false,
 					},
 			{
 				label: 'Show Dashboard',
