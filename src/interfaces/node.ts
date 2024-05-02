@@ -5,6 +5,7 @@ import EventEmitter from 'events';
 
 import { logger } from '../logger.js';
 import Desktop from '../app/index.js';
+import createDefer, { Deferred } from '../helpers/deferred.js';
 
 // TODO: Define the RPC api
 export type NodeRPCMessage = Record<string, any> & {
@@ -43,8 +44,10 @@ export default class Node extends EventEmitter<EventMap> {
 		this.config = config;
 	}
 
-	start() {
-		if (this.started) return;
+	startPromise?: Deferred<void>;
+	start(): Promise<void> {
+		if (this.started) return Promise.resolve();
+		if (this.startPromise) return this.startPromise;
 
 		this.log('Starting');
 		this.started = true;
@@ -53,6 +56,8 @@ export default class Node extends EventEmitter<EventMap> {
 			'@satellite-earth/private-node',
 			import.meta.url,
 		).replace('file://', '');
+
+		this.startPromise = createDefer<void>();
 
 		// Start the local relay database on another thread
 		this.process = fork(instancePath, [], {
@@ -71,9 +76,15 @@ export default class Node extends EventEmitter<EventMap> {
 		// process so tray ui can reflect node status
 		this.process.on('message', (message) => {
 			if (isJsonMessage(message)) {
-				if (message.type === 'LISTENER_STATE') {
-					this.listening = message.data.listening;
-					this.emit('listenerChange', this.listening);
+				switch (message.type) {
+					case 'RELAY_READY':
+						this.startPromise?.resolve();
+						this.startPromise = undefined;
+						break;
+					case 'LISTENER_STATE':
+						this.listening = message.data.listening;
+						this.emit('listenerChange', this.listening);
+						break;
 				}
 
 				this.emit('message', message);
@@ -88,6 +99,11 @@ export default class Node extends EventEmitter<EventMap> {
 		// revert started status to avoid sending an IPC
 		// to the stopped process and crashing the app
 		this.process.on('disconnect', () => {
+			if (this.startPromise) {
+				this.startPromise.reject();
+				this.startPromise = undefined;
+			}
+
 			this.log('Child process disconnected');
 			this.started = false;
 			this.listening = false;
@@ -99,6 +115,8 @@ export default class Node extends EventEmitter<EventMap> {
 
 		this.emit('started');
 		this.emit('message', { type: 'STARTED' });
+
+		return this.startPromise;
 	}
 
 	stop() {

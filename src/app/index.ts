@@ -54,7 +54,6 @@ export default class Desktop {
 
 		this.launcher = new Launcher(path.join(os.homedir(), 'pwa'));
 
-		this.node.start();
 		this.menuManager.setup();
 		this.trayManager.setup();
 
@@ -63,7 +62,9 @@ export default class Desktop {
 			adminAuth: config.auth,
 		}));
 
-		this.openDashboard();
+		this.node.start().then(() => {
+			this.openDashboard();
+		});
 	}
 
 	openDashboard() {
