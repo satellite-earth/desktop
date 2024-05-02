@@ -3,7 +3,7 @@ import { resolve as importMetaResolve } from 'import-meta-resolve';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
-import { IS_DEV } from '../env.js';
+import { IS_DEV, OVERRIDE_DASHBOARD_UI } from '../env.js';
 import type Desktop from './index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -28,7 +28,8 @@ export default class DashboardWindow extends BrowserWindow {
 		});
 
 		const guiURL = new URL(
-			importMetaResolve('@satellite-earth/dashboard-ui', import.meta.url),
+			OVERRIDE_DASHBOARD_UI ||
+				importMetaResolve('@satellite-earth/dashboard-ui', import.meta.url),
 		);
 		guiURL.searchParams.set('url', `ws://127.0.0.1:${config.nodePort}`);
 		guiURL.searchParams.set('auth', config.auth);

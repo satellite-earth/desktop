@@ -1,4 +1,6 @@
-const IS_DEV = process.env.NODE_ENV === 'development';
-const OVERRIDE_UI = process.env.OVERRIDE_UI;
+import 'dotenv/config';
 
-export { IS_DEV, OVERRIDE_UI };
+const IS_DEV = process.env.NODE_ENV === 'development';
+const OVERRIDE_DASHBOARD_UI = process.env.OVERRIDE_DASHBOARD_UI;
+
+export { IS_DEV, OVERRIDE_DASHBOARD_UI };
