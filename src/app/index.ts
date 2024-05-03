@@ -1,16 +1,23 @@
-import { ipcMain, powerMonitor } from 'electron';
+import { BrowserWindow, ipcMain, powerMonitor, screen } from 'electron';
+import { resolve as importMetaResolve } from 'import-meta-resolve';
+import { fileURLToPath } from 'url';
 import path from 'path';
 import os from 'os';
 
-import { IS_DEV } from '../env.js';
+import {
+	IS_DEV,
+	OVERRIDE_COMMUNITY_UI,
+	OVERRIDE_DASHBOARD_UI,
+} from '../env.js';
 import { logger } from '../logger.js';
 import config from './config.js';
 import Node from '../interfaces/node.js';
 import TrayManager from './tray.js';
 import UpdateManager from './updates.js';
 import MenuManager from './menu.js';
-import DashboardWindow from './dashboard.js';
 import Launcher from './launcher.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default class Desktop {
 	log = logger;
@@ -21,7 +28,8 @@ export default class Desktop {
 	config = config;
 
 	launcher: Launcher;
-	dashboard?: DashboardWindow;
+
+	mainWindow?: BrowserWindow;
 
 	constructor() {
 		this.trayManager = new TrayManager(this);
@@ -67,22 +75,64 @@ export default class Desktop {
 		});
 	}
 
-	openDashboard() {
-		if (!this.dashboard) {
-			this.dashboard = new DashboardWindow(this.config);
-			this.dashboard.on('closed', () => {
-				this.dashboard = undefined;
+	private getOrCreateMainWindow() {
+		if (!this.mainWindow) {
+			const mainScreen = screen.getPrimaryDisplay();
+			const { width, height } = mainScreen.size;
+
+			this.mainWindow = new BrowserWindow({
+				width,
+				height,
+				backgroundColor: '#171819',
+				icon: path.join(__dirname, '../assets/logo.png'),
+				webPreferences: {
+					webSecurity: false,
+					allowRunningInsecureContent: false,
+					preload: path.join(__dirname, '../preload/satellite.cjs'),
+				},
+			});
+
+			// @ts-expect-error
+			if (IS_DEV) this.mainWindow.openDevTools();
+
+			this.mainWindow.on('closed', () => {
+				this.mainWindow = undefined;
 			});
 		}
 
-		if (this.dashboard.isVisible()) {
-			this.dashboard.show();
-			this.dashboard.focus();
+		return this.mainWindow;
+	}
+
+	openDashboard() {
+		const window = this.getOrCreateMainWindow();
+
+		const url = new URL(
+			OVERRIDE_DASHBOARD_UI ||
+				importMetaResolve('@satellite-earth/dashboard-ui', import.meta.url),
+		);
+		url.searchParams.set('url', `ws://127.0.0.1:${config.nodePort}`);
+		url.searchParams.set('auth', config.auth);
+		url.searchParams.set('env', 'local');
+
+		window.loadURL(url.toString());
+
+		if (window.isVisible()) {
+			window.show();
 		}
 	}
-	closeDashboard() {
-		if (this.dashboard) {
-			this.dashboard.close();
+
+	openCommunity() {
+		const window = this.getOrCreateMainWindow();
+
+		const url = new URL(
+			OVERRIDE_COMMUNITY_UI ||
+				importMetaResolve('@satellite-earth/community-ui', import.meta.url),
+		);
+
+		window.loadURL(url.toString());
+
+		if (window.isVisible()) {
+			window.show();
 		}
 	}
 

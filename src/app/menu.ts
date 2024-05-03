@@ -39,6 +39,23 @@ export default class MenuManager {
 				],
 			},
 			{
+				label: 'View',
+				submenu: [
+					{
+						label: 'Communities',
+						click: () => {
+							this.desktop.openCommunity();
+						},
+					},
+					{
+						label: 'Dashboard',
+						click: () => {
+							this.desktop.openDashboard();
+						},
+					},
+				],
+			},
+			{
 				label: 'Nostr',
 				submenu: [
 					{

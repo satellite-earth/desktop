@@ -53,28 +53,34 @@ export default class TrayManager {
 		this.menu = Menu.buildFromTemplate([
 			this.desktop.node.started
 				? {
-						label: `Local Relay Active (port ${this.desktop.config.nodePort})`,
+						label: `Local Relay (port ${this.desktop.config.nodePort})`,
 						icon: runningIcon,
 						enabled: false,
 					}
 				: {
-						label: `Local Relay Stopped`,
+						label: `Local Relay`,
 						icon: stoppedIcon,
 						enabled: false,
 					},
 			this.desktop.node.listening
 				? {
-						label: 'Remote Listeners Active',
+						label: 'Receiver Active',
 						icon: runningIcon,
 						enabled: false,
 					}
 				: {
-						label: 'Remote Listeners Disconnected',
+						label: 'Receiver Disconnected',
 						icon: stoppedIcon,
 						enabled: false,
 					},
 			{
-				label: 'Show Dashboard',
+				label: 'Open Community',
+				click: () => {
+					this.desktop.openCommunity();
+				},
+			},
+			{
+				label: 'Open Dashboard',
 				click: () => {
 					this.desktop.openDashboard();
 				},
