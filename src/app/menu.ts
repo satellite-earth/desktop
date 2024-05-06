@@ -1,6 +1,7 @@
 import { Menu } from 'electron';
 
 import type Desktop from './index.js';
+import { IS_DEV } from '../env.js';
 
 export default class MenuManager {
 	desktop: Desktop;
@@ -51,6 +52,15 @@ export default class MenuManager {
 						label: 'Dashboard',
 						click: () => {
 							this.desktop.openDashboard();
+						},
+					},
+					{ type: 'separator', visible: IS_DEV },
+					{
+						label: 'Debug',
+						visible: IS_DEV,
+						click: () => {
+							// @ts-expect-error
+							this.desktop.mainWindow?.openDevTools();
 						},
 					},
 				],
