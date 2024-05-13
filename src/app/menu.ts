@@ -74,6 +74,12 @@ export default class MenuManager {
 							// global.launcher.open();
 						},
 					},
+					{
+						label: 'Add Identity',
+						click: () => {
+							console.log('adding identity');
+						},
+					},
 				],
 			},
 			{

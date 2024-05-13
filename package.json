@@ -37,14 +37,16 @@
 		"electron-log": "^5.1.2",
 		"electron-updater": "^6.1.8",
 		"http-server": "^14.1.1",
-		"import-meta-resolve": "^4.1.0"
+		"import-meta-resolve": "^4.1.0",
+		"keytar": "^7.9.0",
+		"nostr-tools": "^2.5.2"
 	},
 	"devDependencies": {
 		"@aws-sdk/client-s3": "^3.502.0",
 		"@aws-sdk/lib-storage": "^3.502.0",
 		"@electron/rebuild": "^3.6.0",
 		"@types/adm-zip": "^0.5.5",
-		"@types/node": "^20.12.7",
+		"@types/node": "^20.12.11",
 		"electron": "28.2.0",
 		"electron-builder": "^24.13.3",
 		"prettier": "^3.2.5",

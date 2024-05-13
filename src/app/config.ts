@@ -8,9 +8,18 @@ import { logger } from '../logger.js';
 const log = logger.extend('config');
 const configPath = path.join(app.getPath('userData'), 'config.json');
 
-const config = {
+type Config = {
+	auth: string;
+	nodePort: number;
+	activeIdentity: string;
+	NIP07TrustedDomains: string[];
+};
+
+const config: Config = {
 	auth: randomBytes(20).toString('hex'),
 	nodePort: 2012,
+	activeIdentity: '',
+	NIP07TrustedDomains: ['local'],
 };
 
 const loaded = readJSONFile(configPath);

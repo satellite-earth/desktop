@@ -15,6 +15,9 @@ import Node from '../interfaces/node.js';
 import TrayManager from './tray.js';
 import UpdateManager from './updates.js';
 import MenuManager from './menu.js';
+import SecretManager from './secrets.js';
+import IdentityManager from './identities.js';
+import NIP07 from './nip07.js';
 import Launcher from './launcher.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -22,6 +25,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export default class Desktop {
 	log = logger;
 	node: Node;
+	secretManager: SecretManager;
+	identityManager: IdentityManager;
+	nip07: NIP07;
 	trayManager: TrayManager;
 	updateManager?: UpdateManager;
 	menuManager: MenuManager;
@@ -32,6 +38,12 @@ export default class Desktop {
 	mainWindow?: BrowserWindow;
 
 	constructor() {
+		this.secretManager = new SecretManager();
+
+		this.identityManager = new IdentityManager(this);
+
+		this.nip07 = new NIP07(this);
+
 		this.trayManager = new TrayManager(this);
 
 		this.node = new Node(this.config);
@@ -88,7 +100,7 @@ export default class Desktop {
 				webPreferences: {
 					webSecurity: false,
 					allowRunningInsecureContent: false,
-					preload: path.join(__dirname, '../preload/satellite.cjs'),
+					preload: path.join(__dirname, '../preload/main.cjs'),
 				},
 			});
 
