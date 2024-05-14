@@ -29,7 +29,6 @@
 	"license": "MIT",
 	"dependencies": {
 		"@satellite-earth/community-ui": "^0.1.1",
-		"@satellite-earth/dashboard-ui": "^0.1.1",
 		"@satellite-earth/private-node": "^0.2.0",
 		"adm-zip": "^0.5.10",
 		"debug": "^4.3.4",

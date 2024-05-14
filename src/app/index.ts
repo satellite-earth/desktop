@@ -4,11 +4,7 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import os from 'os';
 
-import {
-	IS_DEV,
-	OVERRIDE_COMMUNITY_UI,
-	OVERRIDE_DASHBOARD_UI,
-} from '../env.js';
+import { IS_DEV, OVERRIDE_UI } from '../env.js';
 import { logger } from '../logger.js';
 import Config from './config.js';
 import Node from '../interfaces/node.js';
@@ -123,15 +119,13 @@ export default class Desktop {
 		const window = this.getOrCreateMainWindow();
 
 		const url = new URL(
-			OVERRIDE_DASHBOARD_UI ||
-				importMetaResolve('@satellite-earth/dashboard-ui', import.meta.url),
+			OVERRIDE_UI ||
+				importMetaResolve('@satellite-earth/community-ui', import.meta.url),
 		);
-		url.searchParams.set(
-			'url',
-			`ws://127.0.0.1:${this.config.values.nodePort}`,
-		);
-		url.searchParams.set('auth', this.config.values.auth);
-		url.searchParams.set('env', 'local');
+		const params = new URLSearchParams();
+		params.set('url', `ws://127.0.0.1:${this.config.values.nodePort}`);
+
+		url.hash = `#/dashboard?` + params.toString();
 
 		window.loadURL(url.toString());
 
@@ -144,7 +138,7 @@ export default class Desktop {
 		const window = this.getOrCreateMainWindow();
 
 		const url = new URL(
-			OVERRIDE_COMMUNITY_UI ||
+			OVERRIDE_UI ||
 				importMetaResolve('@satellite-earth/community-ui', import.meta.url),
 		);
 
