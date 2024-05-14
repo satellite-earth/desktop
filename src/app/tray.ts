@@ -53,7 +53,7 @@ export default class TrayManager {
 		this.menu = Menu.buildFromTemplate([
 			this.desktop.node.started
 				? {
-						label: `Local Relay (port ${this.desktop.config.nodePort})`,
+						label: `Local Relay (port ${this.desktop.config.values.nodePort})`,
 						icon: runningIcon,
 						enabled: false,
 					}

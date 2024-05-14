@@ -62,8 +62,8 @@ export default class Node extends EventEmitter<EventMap> {
 		// Start the local relay database on another thread
 		this.process = fork(instancePath, [], {
 			env: {
-				PORT: String(this.config.nodePort),
-				AUTH: this.config.auth,
+				PORT: String(this.config.values.nodePort),
+				AUTH: this.config.values.auth,
 				DATA_PATH: app.getPath('userData'),
 				USE_PREBUILT_SQLITE_BINDINGS: 'true',
 				// pass logging env

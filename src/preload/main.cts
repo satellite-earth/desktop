@@ -37,6 +37,8 @@ contextBridge.exposeInMainWorld('nostr', {
 });
 
 contextBridge.exposeInMainWorld('satellite', {
+	// TODO should namespace these handlers like in
+	// the other preload scripts
 	getLocalRelay: async () =>
 		(await ipcRenderer.invoke('get-satellite-config')).localRelay,
 	getAdminAuth: async () =>

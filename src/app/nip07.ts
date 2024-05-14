@@ -2,12 +2,8 @@ import { app, ipcMain, BrowserWindow } from 'electron';
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
 import path from 'path';
-import {
-	getPublicKey,
-	finalizeEvent,
-	UnsignedEvent,
-	VerifiedEvent,
-} from 'nostr-tools/pure';
+import { finalizeEvent, UnsignedEvent, VerifiedEvent } from 'nostr-tools/pure';
+import { hexToBytes } from '@noble/hashes/utils';
 import { encrypt, decrypt } from 'nostr-tools/nip04';
 import { readJSONFile, writeJSONFile } from '../helpers/file.js';
 import type Desktop from './index.js';
@@ -45,7 +41,6 @@ export default class NIP07 {
 
 		// Resolve user choice from NIP-07 permission prompt
 		ipcMain.handle('resolvePermission', (e, data) => {
-			console.log('handling resolve permission', e, data);
 			// Save always allow/deny if indicated
 			if (data.save) {
 				this.setPermission(data.domain, data.action, data.grant ? 1 : -1);
@@ -72,11 +67,6 @@ export default class NIP07 {
 				let requestedAction = action;
 				let invokeAction: Promise<any>;
 
-				//console.log('url', url);
-				console.log('params', params);
-				console.log('domain', domain);
-				console.log('action', action);
-
 				// If user is requesting to sign event, limit
 				// the scope of the authorization to that specifc
 				// event kind — the model will automatically account
@@ -89,8 +79,6 @@ export default class NIP07 {
 				}
 
 				const p = this.getPermission(domain, requestedAction);
-
-				console.log('p', p);
 
 				// If user always denies this action, return
 				if (p === -1) {
@@ -221,15 +209,6 @@ export default class NIP07 {
 					reject();
 				}
 			});
-			// this.desktop.secretManager.getItem('nsec').then((secretKey) => {
-			// 	if (secretKey) {
-			// 		resolve(
-			// 			/*getPublicKey(Buffer.from(secretKey))*/ 'ff27d01cb1e56fb58580306c7ba76bb037bf211c5b573c56e4e70ca858755af0',
-			// 		);
-			// 	} else {
-			// 		reject();
-			// 	}
-			// });
 		});
 	}
 
@@ -241,7 +220,7 @@ export default class NIP07 {
 		return new Promise((resolve, reject) => {
 			this.desktop.identityManager.getActive().then((identity) => {
 				if (identity) {
-					resolve(finalizeEvent(event, Buffer.from(identity.seckey)));
+					resolve(finalizeEvent(event, hexToBytes(identity.seckey)));
 				} else {
 					reject();
 				}
@@ -253,7 +232,7 @@ export default class NIP07 {
 		return new Promise((resolve, reject) => {
 			this.desktop.identityManager.getActive().then((identity) => {
 				if (identity) {
-					resolve(encrypt(Buffer.from(identity.seckey), pubkey, plaintext));
+					resolve(encrypt(hexToBytes(identity.seckey), pubkey, plaintext));
 				} else {
 					reject();
 				}
@@ -265,7 +244,7 @@ export default class NIP07 {
 		return new Promise((resolve, reject) => {
 			this.desktop.identityManager.getActive().then((identity) => {
 				if (identity) {
-					resolve(decrypt(Buffer.from(identity.seckey), pubkey, ciphertext));
+					resolve(decrypt(hexToBytes(identity.seckey), pubkey, ciphertext));
 				} else {
 					reject();
 				}
@@ -277,7 +256,10 @@ export default class NIP07 {
 
 	getPermission(domain: string, action: string): number {
 		// If domain has been whitelisted bypass permission check
-		if (domain && this.desktop.config.NIP07TrustedDomains.includes(domain)) {
+		if (
+			domain &&
+			this.desktop.config.values.NIP07TrustedDomains.includes(domain)
+		) {
 			return 1;
 		}
 

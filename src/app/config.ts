@@ -2,32 +2,26 @@ import { app } from 'electron';
 import path from 'path';
 import { randomBytes } from 'crypto';
 
-import { readJSONFile, writeJSONFile } from '../helpers/file.js';
-import { logger } from '../logger.js';
+import JSONFile from '../helpers/jsonfile.js';
 
-const log = logger.extend('config');
-const configPath = path.join(app.getPath('userData'), 'config.json');
-
-type Config = {
+type ConfigDefaults = {
 	auth: string;
 	nodePort: number;
 	activeIdentity: string;
 	NIP07TrustedDomains: string[];
 };
 
-const config: Config = {
+const DEFAULT_FILENAME = 'config.json';
+
+const DEFAULT_VALUES: ConfigDefaults = {
 	auth: randomBytes(20).toString('hex'),
 	nodePort: 2012,
 	activeIdentity: '',
 	NIP07TrustedDomains: ['local'],
 };
 
-const loaded = readJSONFile(configPath);
-if (loaded) {
-	Object.assign(config, loaded);
-} else {
-	log('Creating default config');
-	writeJSONFile(config, configPath);
+export default class Config extends JSONFile {
+	constructor(filename = DEFAULT_FILENAME) {
+		super(path.join(app.getPath('userData'), filename), DEFAULT_VALUES);
+	}
 }
-
-export default config;

@@ -10,7 +10,7 @@ import {
 	OVERRIDE_DASHBOARD_UI,
 } from '../env.js';
 import { logger } from '../logger.js';
-import config from './config.js';
+import Config from './config.js';
 import Node from '../interfaces/node.js';
 import TrayManager from './tray.js';
 import UpdateManager from './updates.js';
@@ -31,13 +31,15 @@ export default class Desktop {
 	trayManager: TrayManager;
 	updateManager?: UpdateManager;
 	menuManager: MenuManager;
-	config = config;
+	config: Config;
 
 	launcher: Launcher;
 
 	mainWindow?: BrowserWindow;
 
 	constructor() {
+		this.config = new Config();
+
 		this.secretManager = new SecretManager();
 
 		this.identityManager = new IdentityManager(this);
@@ -78,8 +80,10 @@ export default class Desktop {
 		this.trayManager.setup();
 
 		ipcMain.handle('get-satellite-config', () => ({
-			localRelay: new URL(`ws://127.0.0.1:${config.nodePort}`).toString(),
-			adminAuth: config.auth,
+			localRelay: new URL(
+				`ws://127.0.0.1:${this.config.values.nodePort}`,
+			).toString(),
+			adminAuth: this.config.values.auth,
 		}));
 
 		this.node.start().then(() => {
@@ -122,8 +126,11 @@ export default class Desktop {
 			OVERRIDE_DASHBOARD_UI ||
 				importMetaResolve('@satellite-earth/dashboard-ui', import.meta.url),
 		);
-		url.searchParams.set('url', `ws://127.0.0.1:${config.nodePort}`);
-		url.searchParams.set('auth', config.auth);
+		url.searchParams.set(
+			'url',
+			`ws://127.0.0.1:${this.config.values.nodePort}`,
+		);
+		url.searchParams.set('auth', this.config.values.auth);
 		url.searchParams.set('env', 'local');
 
 		window.loadURL(url.toString());

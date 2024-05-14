@@ -1,5 +1,13 @@
-import { EventEmitter } from 'stream';
+import { ipcMain, BrowserWindow } from 'electron';
+import EventEmitter from 'events';
+import { fileURLToPath } from 'url';
+import path from 'path';
+import { generateSecretKey, getPublicKey } from 'nostr-tools/pure';
+import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import Desktop from './index.js';
+import { nip19 } from 'nostr-tools';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 type IdentityItem = {
 	pubkey: string;
@@ -8,15 +16,97 @@ type IdentityItem = {
 };
 
 // Manage identities
-export default class IdentityManager {
+export default class IdentityManager extends EventEmitter {
 	// TODO: emit event when active identity changes so
 	// things that need to reload can listen for that
 
-	protected KEYSTORE_NAME = 'SatelliteIdentity';
+	KEYSTORE_NAME = 'SatelliteIdentity';
 	desktop: Desktop;
+	ui: any;
 
 	constructor(desktop: Desktop) {
+		super();
 		this.desktop = desktop;
+
+		ipcMain.handle('addIdentity', (e, data) => {
+			this.addIdentity(data.seckey).then((identity) => {
+				this.setActive(identity.pubkey);
+				this.updateUI();
+			});
+		});
+
+		ipcMain.handle('newIdentity', (e, data) => {
+			this.newIdentity().then((identity) => {
+				this.setActive(identity.pubkey);
+				this.updateUI();
+			});
+		});
+
+		ipcMain.handle('removeIdentity', (e, data) => {
+			this.removeIdentity(data.pubkey).then(() => {
+				this.updateUI();
+			});
+		});
+
+		ipcMain.handle('setActiveIdentity', (e, data) => {
+			this.setActive(data.pubkey);
+			this.updateUI();
+		});
+	}
+
+	protected normalizeKeyToHex(s: string): string {
+		let hex = '';
+
+		if (s.startsWith('nsec') || s.startsWith('npub')) {
+			try {
+				hex = bytesToHex(nip19.decode(s).data as Uint8Array);
+			} catch (err) {}
+		} else {
+			hex = s;
+		}
+
+		return hex;
+	}
+
+	protected updateUI(): void {
+		if (!this.ui || this.ui.isDestroyed()) {
+			return;
+		}
+
+		this.listIdentities().then((identities) => {
+			this.ui.webContents.send('update', {
+				identities,
+			});
+		});
+	}
+
+	show(): void {
+		this.ui = new BrowserWindow({
+			parent: this.desktop.mainWindow,
+			closable: true,
+			minimizable: false,
+			maximizable: false,
+			show: false,
+			height: 600,
+			width: 800,
+			webPreferences: {
+				preload: path.join(__dirname, '../preload/identity.cjs'),
+			},
+		});
+
+		// Open a dialog prompting user, passing params in the query string
+		this.ui.loadURL(
+			`file://${path.join(
+				__dirname,
+				'../../views/IdentityManager/index.html',
+			)}`,
+		);
+
+		// Show the ui and init with data
+		this.ui.once('ready-to-show', () => {
+			this.ui.show();
+			this.updateUI();
+		});
 	}
 
 	listIdentities(): Promise<IdentityItem[]> {
@@ -27,12 +117,16 @@ export default class IdentityManager {
 						return {
 							pubkey: key,
 							seckey: value,
-							active: key === this.desktop.config.activeIdentity,
+							active: this.isActive(key),
 						};
 					}),
 				);
 			});
 		});
+	}
+
+	isActive(pubkey: string): boolean {
+		return pubkey === this.desktop.config.values.activeIdentity;
 	}
 
 	getActive(): Promise<IdentityItem | null> {
@@ -50,21 +144,85 @@ export default class IdentityManager {
 		});
 	}
 
-	setActive(pubkey: string): void {
-		// TODO mark identity as active in this.desktop.config
+	setActive(pubkey: string, active: boolean = true): void {
+		const pkhex = this.normalizeKeyToHex(pubkey);
+
+		if (!pkhex) {
+			return;
+		}
+
+		this.desktop.config.save({
+			activeIdentity: active ? pkhex : '',
+		});
 	}
 
-	newIdentity(label: string): void {
-		// TODO generate new secret key, save in secrets and set active
+	newIdentity(): Promise<IdentityItem> {
+		return this.addIdentity(bytesToHex(generateSecretKey()));
 	}
 
-	addIdentity(seckey: string, label: string): void {
-		// TODO validate secret key or nsec and save in secrets
-		// TODO enforce uniqueness of labels and pubkeys
+	addIdentity(seckey: string): Promise<IdentityItem> {
+		return new Promise((resolve, reject) => {
+			const skhex = this.normalizeKeyToHex(seckey);
+
+			if (!skhex) {
+				reject();
+				return;
+			}
+
+			this.listIdentities().then((items) => {
+				let unique = true;
+
+				// Check to prevent duplicate identities
+				for (let item of items) {
+					if (item.seckey === skhex) {
+						unique = false;
+						break;
+					}
+				}
+
+				if (!unique) {
+					reject();
+					return;
+				}
+
+				let pubkey = '';
+
+				// Try to derive the pubkey
+				try {
+					pubkey = getPublicKey(hexToBytes(skhex));
+				} catch (err) {}
+
+				if (!pubkey) {
+					reject();
+					return;
+				}
+
+				this.desktop.secretManager
+					.setItem(this.KEYSTORE_NAME, pubkey, skhex)
+					.then(() => {
+						resolve({
+							pubkey,
+							seckey: skhex,
+							active: this.isActive(pubkey),
+						});
+					});
+			});
+		});
 	}
 
 	removeIdentity(pubkey: string): Promise<boolean> {
-		// TODO if active, unmark as active in this.desktop.config
-		return this.desktop.secretManager.deleteItem(this.KEYSTORE_NAME, pubkey);
+		return new Promise((resolve) => {
+			const pkhex = this.normalizeKeyToHex(pubkey);
+			this.getActive().then((active) => {
+				// If pubkey being removed is active,
+				// change its status to inactive
+				if (pkhex === active?.pubkey) {
+					this.setActive(pkhex, false);
+				}
+				this.desktop.secretManager
+					.deleteItem(this.KEYSTORE_NAME, pkhex)
+					.then(resolve);
+			});
+		});
 	}
 }

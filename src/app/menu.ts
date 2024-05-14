@@ -78,6 +78,7 @@ export default class MenuManager {
 						label: 'Add Identity',
 						click: () => {
 							console.log('adding identity');
+							this.desktop.identityManager.show();
 						},
 					},
 				],
