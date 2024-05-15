@@ -1,7 +1,7 @@
 {
 	"name": "@satellite-earth/desktop",
 	"productName": "Satellite",
-	"version": "0.0.1",
+	"version": "0.2.0",
 	"main": "dist/index.js",
 	"type": "module",
 	"scripts": {
@@ -28,7 +28,7 @@
 	},
 	"license": "MIT",
 	"dependencies": {
-		"@satellite-earth/community-ui": "^0.1.1",
+		"@satellite-earth/community-ui": "^0.2.0",
 		"@satellite-earth/private-node": "^0.2.0",
 		"adm-zip": "^0.5.10",
 		"debug": "^4.3.4",
