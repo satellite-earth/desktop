@@ -96,7 +96,7 @@ export default class Desktop {
 				width,
 				height,
 				backgroundColor: '#171819',
-				icon: path.join(__dirname, '../assets/logo.png'),
+				icon: path.join(__dirname, '../../assets/window.png'),
 				webPreferences: {
 					webSecurity: false,
 					allowRunningInsecureContent: false,
@@ -122,10 +122,7 @@ export default class Desktop {
 			OVERRIDE_UI ||
 				importMetaResolve('@satellite-earth/community-ui', import.meta.url),
 		);
-		const params = new URLSearchParams();
-		params.set('url', `ws://127.0.0.1:${this.config.values.nodePort}`);
-
-		url.hash = `#/dashboard?` + params.toString();
+		url.hash = `#/dashboard`;
 
 		window.loadURL(url.toString());
 
