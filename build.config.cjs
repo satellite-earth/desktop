@@ -4,29 +4,22 @@ module.exports = {
 	directories: {
 		output: './build',
 	},
-	files: ['**/*'],
-	extraResources: [
-		{
-			from: '../core',
-			to: 'core',
-			filter: [
-				'**/*',
-				'!**/{.DS_Store,.env,.git}',
-			],
-		},
-		{
-			from: '../private-node',
-			to: 'private-node',
-			filter: [
-				'**/*',
-				'!**/{.DS_Store,.env,.git}',
-			],
-		},
-		{
-			from: '../dashboard-ui/dist',
-			to: 'dashboard-ui',
-		}
-	],
+	// extraResources: [
+	// 	{
+	// 		from: '../core',
+	// 		to: 'core',
+	// 		filter: ['**/*', '!**/{.DS_Store,.env,.git}'],
+	// 	},
+	// 	{
+	// 		from: '../private-node',
+	// 		to: 'private-node',
+	// 		filter: ['**/*', '!**/{.DS_Store,.env,.git}'],
+	// 	},
+	// 	{
+	// 		from: '../dashboard-ui/dist',
+	// 		to: 'dashboard-ui',
+	// 	},
+	// ],
 	mac: {
 		icon: 'assets/icon.icns',
 		// target: [
@@ -42,12 +35,6 @@ module.exports = {
 	},
 	linux: {
 		target: 'AppImage',
-		// target: [
-		// 	{
-		// 		target: 'AppImage',
-		// 		arch: [ 'x64' ]
-		// 	}
-		// ]
 	},
 	// win: {
 	// 	target: [
@@ -64,4 +51,5 @@ module.exports = {
 		path: '/',
 		endpoint: 'https://release.satellite.earth',
 	},
+	includeSubNodeModules: true,
 };
