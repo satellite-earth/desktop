@@ -1,7 +1,7 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { ipcMain, BrowserWindow } from 'electron';
 import EventEmitter from 'events';
-import { fileURLToPath } from 'url';
-import path from 'path';
 import { generateSecretKey, getPublicKey } from 'nostr-tools/pure';
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import Desktop from './index.js';
@@ -15,11 +15,12 @@ type IdentityItem = {
 	active: boolean;
 };
 
-// Manage identities
-export default class IdentityManager extends EventEmitter {
-	// TODO: emit event when active identity changes so
-	// things that need to reload can listen for that
+type EventMap = {
+	'active:changed': [string];
+};
 
+// Manage identities
+export default class IdentityManager extends EventEmitter<EventMap> {
 	KEYSTORE_NAME = 'SatelliteIdentity';
 	desktop: Desktop;
 	ui: any;
@@ -51,6 +52,13 @@ export default class IdentityManager extends EventEmitter {
 		ipcMain.handle('setActiveIdentity', (e, data) => {
 			this.setActive(data.pubkey);
 			this.updateUI();
+		});
+
+		// emit active:changed event when activeIdentity in config changes
+		this.desktop.config.on('changed', ({ key }) => {
+			if (key === 'activeIdentity') {
+				this.emit('active:changed', this.desktop.config.values.activeIdentity);
+			}
 		});
 	}
 
@@ -145,7 +153,7 @@ export default class IdentityManager extends EventEmitter {
 			return;
 		}
 
-		this.desktop.config.save({
+		this.desktop.config.set({
 			activeIdentity: active ? pkhex : '',
 		});
 	}
