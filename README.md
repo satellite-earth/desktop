@@ -11,7 +11,7 @@ It basically bundles 3 things:
 
 - A local dedicated Satellite node to back up your notes and media ([private-node](https://github.com/satellite-earth/private-node))
 - An admin interface for managing your local private node ([dashboard-ui](https://github.com/satellite-earth/dashboard-ui))
-- An social interface for interacting with remote public nodes ([community-ui](https://github.com/satellite-earth/community-ui))
+- An social interface for interacting with remote public nodes ([web-ui](https://github.com/satellite-earth/web-ui))
 
 ### Run it
 

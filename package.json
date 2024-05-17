@@ -29,7 +29,6 @@
 	"license": "MIT",
 	"dependencies": {
 		"@noble/hashes": "^1.4.0",
-		"@satellite-earth/community-ui": "^0.2.0",
 		"@satellite-earth/private-node": "^0.2.0",
 		"adm-zip": "^0.5.10",
 		"debug": "^4.3.4",

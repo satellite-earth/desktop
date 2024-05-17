@@ -1,5 +1,4 @@
 import { BrowserWindow, ipcMain, powerMonitor, screen } from 'electron';
-import { resolve as importMetaResolve } from 'import-meta-resolve';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import os from 'os';
@@ -83,7 +82,9 @@ export default class Desktop {
 		}));
 
 		this.node.start().then(() => {
-			this.openDashboard();
+			setTimeout(() => {
+				this.openDashboard();
+			}, 500);
 		});
 	}
 
@@ -119,10 +120,9 @@ export default class Desktop {
 		const window = this.getOrCreateMainWindow();
 
 		const url = new URL(
-			OVERRIDE_UI ||
-				importMetaResolve('@satellite-earth/community-ui', import.meta.url),
+			'/dashboard',
+			OVERRIDE_UI || `http://127.0.0.1:${this.config.values.nodePort}`,
 		);
-		url.hash = `#/dashboard`;
 
 		window.loadURL(url.toString());
 
@@ -135,8 +135,8 @@ export default class Desktop {
 		const window = this.getOrCreateMainWindow();
 
 		const url = new URL(
-			OVERRIDE_UI ||
-				importMetaResolve('@satellite-earth/community-ui', import.meta.url),
+			'/',
+			OVERRIDE_UI || `http://127.0.0.1:${this.config.values.nodePort}`,
 		);
 
 		window.loadURL(url.toString());
