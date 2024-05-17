@@ -146,6 +146,23 @@ export default class Desktop {
 		}
 	}
 
+	/*
+	createModal(selector: string, windowOptions = {}) {
+		const modal = new BrowserWindow({
+			parent: this.mainWindow,
+			...windowOptions,
+		});
+
+		const url = new URL(
+			//`file://${path.join(__dirname, '../../../desktop-ui/dist/index.html#')}`,
+		);
+
+		url.hash = selector;
+		modal.loadURL(url.toString());
+		return modal;
+	}
+	*/
+
 	shutdown() {
 		this.node.stop();
 	}

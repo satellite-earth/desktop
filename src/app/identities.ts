@@ -81,8 +81,8 @@ export default class IdentityManager extends EventEmitter {
 	}
 
 	show(): void {
-		this.ui = new BrowserWindow({
-			parent: this.desktop.mainWindow,
+		/*
+		this.ui = this.desktop.createModal('identity', {
 			closable: true,
 			minimizable: false,
 			maximizable: false,
@@ -90,23 +90,17 @@ export default class IdentityManager extends EventEmitter {
 			height: 600,
 			width: 800,
 			webPreferences: {
-				preload: path.join(__dirname, '../preload/identity.cjs'),
+				preload: path.join(__dirname, `../preload/identity.cjs`),
 			},
 		});
-
-		// Open a dialog prompting user, passing params in the query string
-		this.ui.loadURL(
-			`file://${path.join(
-				__dirname,
-				'../../views/IdentityManager/index.html',
-			)}`,
-		);
 
 		// Show the ui and init with data
 		this.ui.once('ready-to-show', () => {
 			this.ui.show();
+			this.ui.openDevTools();
 			this.updateUI();
 		});
+		*/
 	}
 
 	listIdentities(): Promise<IdentityItem[]> {
