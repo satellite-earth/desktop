@@ -28,6 +28,7 @@
 	},
 	"license": "MIT",
 	"dependencies": {
+		"@noble/hashes": "^1.4.0",
 		"@satellite-earth/community-ui": "^0.2.0",
 		"@satellite-earth/private-node": "^0.2.0",
 		"adm-zip": "^0.5.10",
@@ -43,8 +44,8 @@
 	"devDependencies": {
 		"@aws-sdk/client-s3": "^3.502.0",
 		"@aws-sdk/lib-storage": "^3.502.0",
-		"@electron/rebuild": "^3.6.0",
 		"@types/adm-zip": "^0.5.5",
+		"@types/debug": "^4.1.12",
 		"@types/node": "^20.12.11",
 		"electron": "28.2.0",
 		"electron-builder": "^24.13.3",
