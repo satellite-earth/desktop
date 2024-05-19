@@ -89,7 +89,6 @@ export default class IdentityManager extends EventEmitter<EventMap> {
 	}
 
 	show(): void {
-		/*
 		this.ui = this.desktop.createModal('identity', {
 			closable: true,
 			minimizable: false,
@@ -99,6 +98,7 @@ export default class IdentityManager extends EventEmitter<EventMap> {
 			width: 800,
 			webPreferences: {
 				preload: path.join(__dirname, `../preload/identity.cjs`),
+				cache: false,
 			},
 		});
 
@@ -108,7 +108,6 @@ export default class IdentityManager extends EventEmitter<EventMap> {
 			this.ui.openDevTools();
 			this.updateUI();
 		});
-		*/
 	}
 
 	listIdentities(): Promise<IdentityItem[]> {

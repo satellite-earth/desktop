@@ -146,22 +146,18 @@ export default class Desktop {
 		}
 	}
 
-	/*
-	createModal(selector: string, windowOptions = {}) {
+	createModal(selector: string, windowOptions = {}): BrowserWindow {
 		const modal = new BrowserWindow({
 			parent: this.mainWindow,
 			...windowOptions,
 		});
 
-		const url = new URL(
-			//`file://${path.join(__dirname, '../../../desktop-ui/dist/index.html#')}`,
-		);
+		const url = new URL(`http://127.0.0.1:${this.config.values.nodePort}`);
 
-		url.hash = selector;
+		url.hash = `desktop:${selector}`;
 		modal.loadURL(url.toString());
 		return modal;
 	}
-	*/
 
 	shutdown() {
 		this.node.stop();
