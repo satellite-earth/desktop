@@ -53,7 +53,7 @@ export default class Node extends EventEmitter<EventMap> {
 		this.started = true;
 
 		const instancePath = importMetaResolve(
-			'@satellite-earth/private-node',
+			'@satellite-earth/personal-node',
 			import.meta.url,
 		).replace('file://', '');
 
