@@ -7,29 +7,33 @@ type ValueChanged = {
 };
 
 type EventMap = {
-	'event:changed': [ValueChanged];
+	changed: [ValueChanged];
 };
 
-export default class JSONFile extends EventEmitter<EventMap> {
+export default class JSONFile<
+	T extends Record<any, any> = {},
+> extends EventEmitter<EventMap> {
 	path: string;
-	values: any = {};
+	values: T;
 
-	constructor(path: string, defaultValues = {}) {
+	constructor(path: string, defaultValues?: T) {
 		super();
 		this.path = path;
-		this.load({
+
+		this.values = {
 			...defaultValues,
-			...(readJSONFile(this.path) || {}),
-		});
+			...readJSONFile<T>(this.path),
+		} as T;
 	}
 
-	load(values: any = {}): void {
+	load(values: T): void {
 		for (let key of Object.keys(values)) {
 			let changing = this.values[key] !== values[key];
-			console.log('changing', key, changing);
+
 			if (changing) {
+				// @ts-expect-error
 				this.values[key] = values[key];
-				this.emit('event:changed', {
+				this.emit('changed', {
 					value: values[key],
 					key,
 				});
@@ -37,7 +41,17 @@ export default class JSONFile extends EventEmitter<EventMap> {
 		}
 	}
 
-	save(values = {}): void {
+	set(values: Partial<T>): void {
+		for (let [key, value] of Object.entries(values)) {
+			if (this.values[key] !== value) {
+				// @ts-expect-error
+				this.values[key] = value;
+				this.emit('changed', { key, value });
+			}
+		}
+	}
+
+	save(values = this.values): void {
 		this.load(values);
 		writeJSONFile(this.values, this.path);
 	}

@@ -2,8 +2,6 @@ import { app } from 'electron';
 import Desktop from './app/index.js';
 import { logger } from './logger.js';
 
-import crypto from 'crypto';
-
 app
 	.whenReady()
 	.then(() => {

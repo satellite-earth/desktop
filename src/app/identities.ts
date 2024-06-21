@@ -1,7 +1,7 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { ipcMain, BrowserWindow } from 'electron';
 import EventEmitter from 'events';
-import { fileURLToPath } from 'url';
-import path from 'path';
 import { generateSecretKey, getPublicKey } from 'nostr-tools/pure';
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import Desktop from './index.js';
@@ -15,11 +15,12 @@ type IdentityItem = {
 	active: boolean;
 };
 
-// Manage identities
-export default class IdentityManager extends EventEmitter {
-	// TODO: emit event when active identity changes so
-	// things that need to reload can listen for that
+type EventMap = {
+	'active:changed': [string];
+};
 
+// Manage identities
+export default class IdentityManager extends EventEmitter<EventMap> {
 	KEYSTORE_NAME = 'SatelliteIdentity';
 	desktop: Desktop;
 	ui: any;
@@ -52,6 +53,13 @@ export default class IdentityManager extends EventEmitter {
 			this.setActive(data.pubkey);
 			this.updateUI();
 		});
+
+		// emit active:changed event when activeIdentity in config changes
+		this.desktop.config.on('changed', ({ key }) => {
+			if (key === 'activeIdentity') {
+				this.emit('active:changed', this.desktop.config.values.activeIdentity);
+			}
+		});
 	}
 
 	protected normalizeKeyToHex(s: string): string {
@@ -81,8 +89,7 @@ export default class IdentityManager extends EventEmitter {
 	}
 
 	show(): void {
-		this.ui = new BrowserWindow({
-			parent: this.desktop.mainWindow,
+		this.ui = this.desktop.createModal('identity', {
 			closable: true,
 			minimizable: false,
 			maximizable: false,
@@ -90,21 +97,15 @@ export default class IdentityManager extends EventEmitter {
 			height: 600,
 			width: 800,
 			webPreferences: {
-				preload: path.join(__dirname, '../preload/identity.cjs'),
+				preload: path.join(__dirname, `../preload/identity.cjs`),
+				cache: false,
 			},
 		});
-
-		// Open a dialog prompting user, passing params in the query string
-		this.ui.loadURL(
-			`file://${path.join(
-				__dirname,
-				'../../views/IdentityManager/index.html',
-			)}`,
-		);
 
 		// Show the ui and init with data
 		this.ui.once('ready-to-show', () => {
 			this.ui.show();
+			this.ui.openDevTools();
 			this.updateUI();
 		});
 	}
@@ -151,7 +152,7 @@ export default class IdentityManager extends EventEmitter {
 			return;
 		}
 
-		this.desktop.config.save({
+		this.desktop.config.set({
 			activeIdentity: active ? pkhex : '',
 		});
 	}

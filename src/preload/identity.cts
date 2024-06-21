@@ -1,6 +1,7 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
-contextBridge.exposeInMainWorld('satellite', {
+/** API for desktop UI only */
+contextBridge.exposeInMainWorld('desktop', {
 	identity: {
 		newIdentity() {
 			ipcRenderer.invoke('newIdentity');
