@@ -1,7 +1,7 @@
 {
 	"name": "@satellite-earth/desktop",
 	"productName": "Satellite",
-	"version": "0.2.0",
+	"version": "0.3.0",
 	"main": "dist/index.js",
 	"type": "module",
 	"scripts": {
@@ -29,7 +29,7 @@
 	"license": "MIT",
 	"dependencies": {
 		"@noble/hashes": "^1.4.0",
-		"@satellite-earth/personal-node": "^0.2.0",
+		"@satellite-earth/personal-node": "^0.3.0",
 		"adm-zip": "^0.5.10",
 		"debug": "^4.3.4",
 		"dotenv": "^16.4.5",
