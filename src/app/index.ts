@@ -120,7 +120,7 @@ export default class Desktop {
 		const window = this.getOrCreateMainWindow();
 
 		const url = new URL(
-			'/dashboard',
+			'/',
 			OVERRIDE_UI || `http://127.0.0.1:${this.config.values.nodePort}`,
 		);
 
