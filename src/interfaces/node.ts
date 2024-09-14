@@ -6,6 +6,7 @@ import EventEmitter from 'events';
 import { logger } from '../logger.js';
 import Desktop from '../app/index.js';
 import createDefer, { Deferred } from '../helpers/deferred.js';
+import { OVERRIDE_INSTANCE_PATH } from '../env.js';
 
 // TODO: Define the RPC api
 export type NodeRPCMessage = Record<string, any> & {
@@ -46,22 +47,28 @@ export default class Node extends EventEmitter<EventMap> {
 
 	startPromise?: Deferred<void>;
 	start(): Promise<void> {
+		// Don't start the node if there's no active identity
+		if (!this.config.values.activeIdentity) return Promise.resolve();
+
 		if (this.started) return Promise.resolve();
 		if (this.startPromise) return this.startPromise;
 
 		this.log('Starting');
 		this.started = true;
 
-		const instancePath = importMetaResolve(
-			'@satellite-earth/personal-node',
-			import.meta.url,
-		).replace('file://', '');
+		const instancePath =
+			OVERRIDE_INSTANCE_PATH ||
+			importMetaResolve(
+				'@satellite-earth/personal-node',
+				import.meta.url,
+			).replace('file://', '');
 
 		this.startPromise = createDefer<void>();
 
 		// Start the local relay database on another thread
 		this.process = fork(instancePath, [], {
 			env: {
+				OWNER_PUBKEY: this.config.values.activeIdentity,
 				PORT: String(this.config.values.nodePort),
 				AUTH: this.config.values.auth,
 				DATA_PATH: app.getPath('userData'),

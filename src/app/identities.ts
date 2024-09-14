@@ -1,13 +1,9 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { ipcMain, BrowserWindow } from 'electron';
+import { ipcMain } from 'electron';
 import EventEmitter from 'events';
 import { generateSecretKey, getPublicKey } from 'nostr-tools/pure';
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import Desktop from './index.js';
 import { nip19 } from 'nostr-tools';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 type IdentityItem = {
 	pubkey: string;
@@ -32,26 +28,21 @@ export default class IdentityManager extends EventEmitter<EventMap> {
 		ipcMain.handle('addIdentity', (e, data) => {
 			this.addIdentity(data.seckey).then((identity) => {
 				this.setActive(identity.pubkey);
-				this.updateUI();
 			});
 		});
 
 		ipcMain.handle('newIdentity', (e, data) => {
 			this.newIdentity().then((identity) => {
 				this.setActive(identity.pubkey);
-				this.updateUI();
 			});
 		});
 
 		ipcMain.handle('removeIdentity', (e, data) => {
-			this.removeIdentity(data.pubkey).then(() => {
-				this.updateUI();
-			});
+			this.removeIdentity(data.pubkey).then(() => {});
 		});
 
 		ipcMain.handle('setActiveIdentity', (e, data) => {
 			this.setActive(data.pubkey);
-			this.updateUI();
 		});
 
 		// emit active:changed event when activeIdentity in config changes
@@ -74,40 +65,6 @@ export default class IdentityManager extends EventEmitter<EventMap> {
 		}
 
 		return hex;
-	}
-
-	protected updateUI(): void {
-		if (!this.ui || this.ui.isDestroyed()) {
-			return;
-		}
-
-		this.listIdentities().then((identities) => {
-			this.ui.webContents.send('update', {
-				identities,
-			});
-		});
-	}
-
-	show(): void {
-		this.ui = this.desktop.createModal('identity', {
-			closable: true,
-			minimizable: false,
-			maximizable: false,
-			show: false,
-			height: 600,
-			width: 800,
-			webPreferences: {
-				preload: path.join(__dirname, `../preload/identity.cjs`),
-				cache: false,
-			},
-		});
-
-		// Show the ui and init with data
-		this.ui.once('ready-to-show', () => {
-			this.ui.show();
-			this.ui.openDevTools();
-			this.updateUI();
-		});
 	}
 
 	listIdentities(): Promise<IdentityItem[]> {
@@ -152,9 +109,12 @@ export default class IdentityManager extends EventEmitter<EventMap> {
 			return;
 		}
 
+		// Save the active identity in the config
 		this.desktop.config.set({
 			activeIdentity: active ? pkhex : '',
 		});
+
+		this.desktop.config.save();
 	}
 
 	newIdentity(): Promise<IdentityItem> {
@@ -181,11 +141,6 @@ export default class IdentityManager extends EventEmitter<EventMap> {
 					}
 				}
 
-				if (!unique) {
-					reject();
-					return;
-				}
-
 				let pubkey = '';
 
 				// Try to derive the pubkey
@@ -198,15 +153,25 @@ export default class IdentityManager extends EventEmitter<EventMap> {
 					return;
 				}
 
-				this.desktop.secretManager
-					.setItem(this.KEYSTORE_NAME, pubkey, skhex)
-					.then(() => {
-						resolve({
-							pubkey,
-							seckey: skhex,
-							active: this.isActive(pubkey),
+				const active = this.isActive(pubkey);
+
+				if (unique) {
+					this.desktop.secretManager
+						.setItem(this.KEYSTORE_NAME, pubkey, skhex)
+						.then(() => {
+							resolve({
+								active,
+								pubkey,
+								seckey: skhex,
+							});
 						});
+				} else {
+					resolve({
+						active,
+						pubkey,
+						seckey: skhex,
 					});
+				}
 			});
 		});
 	}

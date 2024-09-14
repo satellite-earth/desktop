@@ -65,24 +65,24 @@ export default class MenuManager {
 					},
 				],
 			},
-			{
-				label: 'Nostr',
-				submenu: [
-					{
-						label: 'Open Application',
-						click: () => {
-							// global.launcher.open();
-						},
-					},
-					{
-						label: 'Add Identity',
-						click: () => {
-							console.log('adding identity');
-							this.desktop.identityManager.show();
-						},
-					},
-				],
-			},
+			// {
+			// 	label: 'Nostr',
+			// 	submenu: [
+			// 		{
+			// 			label: 'Open Application',
+			// 			click: () => {
+			// 				// global.launcher.open();
+			// 			},
+			// 		},
+			// 		{
+			// 			label: 'Add Identity',
+			// 			click: () => {
+			// 				console.log('adding identity');
+			// 				this.desktop.identityManager.show();
+			// 			},
+			// 		},
+			// 	],
+			// },
 			{
 				label: 'Edit',
 				submenu: [

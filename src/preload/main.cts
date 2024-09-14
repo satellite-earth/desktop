@@ -43,4 +43,17 @@ contextBridge.exposeInMainWorld('satellite', {
 		(await ipcRenderer.invoke('get-satellite-config')).localRelay,
 	getAdminAuth: async () =>
 		(await ipcRenderer.invoke('get-satellite-config')).adminAuth,
+	newIdentity() {
+		ipcRenderer.invoke('newIdentity');
+	},
+	addIdentity(seckey: string) {
+		ipcRenderer.invoke('addIdentity', {
+			seckey,
+		});
+	},
+	removeIdentity(pubkey: string) {
+		ipcRenderer.invoke('removeIdentity', {
+			pubkey,
+		});
+	},
 });
