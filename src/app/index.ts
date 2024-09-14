@@ -86,6 +86,22 @@ export default class Desktop {
 				this.openDashboard();
 			}, 500);
 		});
+
+		// Start the node if the active identity changes
+		// and the node is not already started - this
+		// way the node starts automatically after the
+		// user adds an owner for the first time
+		this.config.on('changed', (config) => {
+			if (
+				!this.node.started &&
+				config.key === 'activeIdentity' &&
+				config.value
+			) {
+				this.log('Starting node because active identity changed');
+				// Start the node
+				this.node.start();
+			}
+		});
 	}
 
 	private getOrCreateMainWindow() {
