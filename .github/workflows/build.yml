@@ -36,16 +36,14 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
 
-      - name: Build Electron app
-        uses: samuelmeuli/action-electron-builder@v1
-        with:
-          github_token: ${{ secrets.github_token }}
+      - name: Build Electron
+        run: pnpm electron-builder
 
-      # - name: Upload artifacts
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: ${{ matrix.name }}-build
-      #     path: |
-      #       build/*.exe
-      #       build/*.dmg
-      #       build/*.AppImage
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.os }}-build
+          path: |
+            build/*.exe
+            build/*.dmg
+            build/*.AppImage
