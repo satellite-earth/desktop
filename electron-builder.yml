@@ -42,8 +42,9 @@ win:
       arch: [x64, arm64]
 
 publish:
-  provider: 's3'
-  bucket: 'release'
-  region: 'auto'
-  path: '/'
-  endpoint: 'https://release.satellite.earth'
+  - provider: github
+  - provider: 's3'
+    bucket: 'release'
+    region: 'auto'
+    path: '/'
+    endpoint: 'https://release.satellite.earth'

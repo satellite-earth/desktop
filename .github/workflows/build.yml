@@ -46,6 +46,8 @@ jobs:
 
       - name: Build Electron
         run: pnpm electron-builder
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
