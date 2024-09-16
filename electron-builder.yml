@@ -21,7 +21,7 @@ mac:
   # binaries: []
   target:
     - target: dmg
-      arch: [universal, x64, armv7l, arm64]
+      arch: [universal, x64]
 
 linux:
   executableName: Satellite
