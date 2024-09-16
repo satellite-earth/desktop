@@ -1,0 +1,51 @@
+name: Build Electron App
+
+on:
+  push:
+    tags:
+      - v*.*.*
+    branches:
+      - master
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Install Snapcraft
+        if: startsWith(matrix.os, 'ubuntu')
+        uses: samuelmeuli/action-snapcraft@v2
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Build Electron app
+        uses: samuelmeuli/action-electron-builder@v1
+        with:
+          github_token: ${{ secrets.github_token }}
+
+      # - name: Upload artifacts
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: ${{ matrix.name }}-build
+      #     path: |
+      #       build/*.exe
+      #       build/*.dmg
+      #       build/*.AppImage

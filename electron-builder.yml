@@ -1,21 +1,45 @@
-appId: 'earth.satellite.node'
-productName: 'Satellite'
+appId: earth.satellite.node
+productName: Satellite
+
+# make sure the build artifact has arch in the filename
+artifactName: Satellite-${version}-${arch}.${ext}
+
 directories:
   output: './build'
 
-files: ['dist', 'assets', 'views']
+includeSubNodeModules: true
+
+files: ['dist', 'assets']
 
 mac:
+  category: public.app-category.social-networking
   icon: 'assets/icon.icns'
+  darkModeSupport: true
+  # this is where we would add the tor binary
+  # binaries: []
+  target:
+    - target: dmg
+      arch: [universal, x64, armv7l, arm64]
 
 linux:
-  target: 'AppImage'
+  executableName: Satellite
   category: P2P
+  target:
+    - target: AppImage
+      arch: [x64, arm64]
+    - target: snap
+      arch: [x64]
+    - target: deb
+      arch: [x64, arm64]
+    - target: tar.gz
+      arch: [x64, arm64]
 
 win:
   target:
-    - target: 'nsis'
-      arch: ['x64']
+    - target: nsis
+      arch: [x64, arm64]
+    - target: portable
+      arch: [x64, arm64]
 
 publish:
   provider: 's3'
