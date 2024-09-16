@@ -16,6 +16,7 @@
 		"build-linux": "electron-builder --linux --publish never",
 		"prebuild-all": "pnpm build",
 		"build-all": "electron-builder --linux --mac --win --publish never",
+		"electron": "electron-builder --publish never",
 		"deploy": "node deploy/index.js",
 		"format": "prettier -w .",
 		"postinstall": "electron-builder install-app-deps"
@@ -30,7 +31,7 @@
 	"license": "MIT",
 	"dependencies": {
 		"@noble/hashes": "^1.4.0",
-		"@satellite-earth/personal-node": "^0.4.0",
+		"@satellite-earth/personal-node": "0.4.0",
 		"adm-zip": "^0.5.10",
 		"debug": "^4.3.4",
 		"dotenv": "^16.4.5",
