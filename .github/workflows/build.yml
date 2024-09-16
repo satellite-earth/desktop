@@ -40,10 +40,12 @@ jobs:
         run: pnpm electron-builder
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}-build
           path: |
             build/*.exe
             build/*.dmg
             build/*.AppImage
+            build/*.snap
+            build/*.tar.gz
