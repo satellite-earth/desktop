@@ -43,8 +43,8 @@ win:
 
 publish:
   - provider: github
-  - provider: 's3'
-    bucket: 'release'
-    region: 'auto'
-    path: '/'
-    endpoint: 'https://release.satellite.earth'
+  # - provider: 's3'
+  #   bucket: 'release'
+  #   region: 'auto'
+  #   path: '/'
+  #   endpoint: 'https://release.satellite.earth'
