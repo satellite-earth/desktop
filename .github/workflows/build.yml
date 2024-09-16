@@ -21,6 +21,11 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
+      # This is nessisary because newer versions of pthon no longer have the 'distutils' package
+      - name: Install python-setuptools
+        if: startsWith(matrix.os, 'macos')
+        run: brew install python-setuptools
+
       - name: Install Snapcraft
         if: startsWith(matrix.os, 'ubuntu')
         uses: samuelmeuli/action-snapcraft@v2
