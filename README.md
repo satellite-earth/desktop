@@ -5,21 +5,20 @@
 
 # Satellite Desktop
 
-Satellite Desktop lets you easily install and manage a nostr relay and blossom media proxy running on your local machine.
+Satellite Desktop lets you easily install and manage a [personal-node](https://github.com/satellite-earth/personal-node) running on your local machine.
 
-It basically bundles 3 things:
+## Setup Development environment
 
-- A local dedicated Satellite node to back up your notes and media ([personal-node](https://github.com/satellite-earth/personal-node))
-- An social interface for interacting with remote public nodes ([web-ui](https://github.com/satellite-earth/web-ui))
+This project uses [pnpm](https://pnpm.io/) to manage dependencies
 
-### Run it
+NOTE: There is an issue with `node-gyp` and python versions `>3.12` that require an extra python package to be install. see this [issue](https://stackoverflow.com/questions/77251296/distutils-not-found-when-running-npm-install/77638742#77638742) for more info
 
-You can try running it yourself in dev mode:
+This can be installed with `brew install python-setuptools`
 
-`npm i`
+Then you can clone the repo and install the dependencies
 
-`npm run dev`
-
-You can also try packaging it. If you're on a mac, run `npm run build`. If you don't have a mac, run `npm run build-linux`. If you're on Windows you're out of luck.
-
-In either case, because of hardcoded relative paths, this will only work if the repos mentioned above are in the same parent directory alongside `desktop`. (Also, make sure you separately `npm run build` all three repos after cloning into them before trying to launch desktop)
+```sh
+git clone https://github.com/satellite-earth/desktop.git
+cd desktop
+pnpm install
+```
